@@ -29,7 +29,7 @@ oc new-project loadbalancing-test
 Create the frontend app, that listens on port `8000`, responds on route `/test` and queries the backend app via gRPC.
 
 ```shell
-oc apply -f manifests/app-1.yml
+oc apply -f manifests/app-1
 ```
 
 #### Optional commands
@@ -64,7 +64,7 @@ Disable cookies entirely (to test LB via browser too)
 oc annotate route app-1 haproxy.router.openshift.io/disable_cookies=true
 ```
 
-Remove the app (optional)
+Remove the app
 
 ```sh
 oc delete all --selector app=app-1
@@ -75,7 +75,7 @@ oc delete all --selector app=app-1
 Create the backend service, that listens on port `8080` (gRPC)
 
 ```sh
-oc apply -f manifests/app-2.yml
+oc apply -f manifests/app-2
 ```
 
 ### Test the apps
@@ -84,8 +84,10 @@ oc apply -f manifests/app-2.yml
 oc get route app-1 -o jsonpath='{.spec.host}'
 set URL=<url>
 
-for /l %l in (0,0,1) do; @curl %URL%/test & echo. & timeout 1 > NUL
+# for /l %l in (0,0,1) do; @curl %URL%/test & echo. & timeout 1 > NUL
 ```
+
+Open the `http://<URL>` in browser
 
 #### Optional commands
 
@@ -134,7 +136,7 @@ crc config set disk-size 62
 
 ```sh
 #oc create namespace openshift-operators
-oc apply -f manifests/operators.yml -n openshift-operators
+oc apply -f manifests/operators -n openshift-operators
 ```
 
 #### Check installation process
@@ -170,7 +172,7 @@ oc get csv <csv> -o template --template '{{.status.phase}}'
 
 ```sh
 oc create namespace istio-system
-oc apply -f manifests/smcp.yml -n istio-system
+oc apply -f manifests/servicemesh-control-plane.yml -n istio-system
 ```
 
 Get installation status
@@ -185,7 +187,7 @@ oc get smcp -n istio-system
 ### Install Service Mesh Member Roll
 
 ```sh
-oc apply -f manifests/smmr.yml -n istio-system
+oc apply -f manifests/servicemesh-member-roll.yml -n istio-system
 ```
 
 Get installation status
@@ -220,6 +222,6 @@ oc get route kiali -n istio-system -o jsonpath='{.spec.host}'
 ### Service Mesh Removal
 
 ```sh
-oc delete smcp default -n istio-system
-oc delete -f manifests/operators.yml -n istio-system
+oc delete namespace istio-system
+oc delete -f manifests/operators -n openshift-operators
 ```
