@@ -1,0 +1,36 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"app-1:latest"},"fieldPath":"spec.template.spec.containers[?(@.name==\"app-1\")].image"}]'
+  labels:
+    app: app-1
+    app.kubernetes.io/part-of: loadbalancing-test
+  name: app-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-1
+      app.kubernetes.io/part-of: loadbalancing-test
+      deployment: app-1
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: 'true'
+      labels:
+        app: app-1
+        app.kubernetes.io/part-of: loadbalancing-test
+        deployment: app-1
+        version: v1
+    spec:
+      containers:
+        - env:
+            - name: APP_2_ADDR
+              value: 'app-2:8080'
+          image: 'image-registry.openshift-image-registry.svc:5000/loadbalancing-test/app-1'
+          name: app-1
+          ports:
+            - containerPort: 8000
+              protocol: TCP

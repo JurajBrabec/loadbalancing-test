@@ -1,0 +1,14 @@
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: app-1
+    app.kubernetes.io/part-of: loadbalancing-test
+  name: app-1
+spec:
+  to:
+    kind: Service
+    name: app-1
+  port:
+    targetPort: tcp-8000

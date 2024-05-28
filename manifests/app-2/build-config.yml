@@ -1,0 +1,25 @@
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    app: app-2
+    app.kubernetes.io/part-of: loadbalancing-test
+  name: app-2
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: app-2:latest
+  source:
+    contextDir: /
+    git:
+      uri: https://github.com/JurajBrabec/loadbalancing-test.git
+    type: Git
+  strategy:
+    dockerStrategy:
+      dockerfilePath: Dockerfile-app-2
+    type: Docker
+  triggers:
+    - type: ConfigChange
+    - type: ImageChange
