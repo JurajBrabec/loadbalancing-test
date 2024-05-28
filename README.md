@@ -1,30 +1,71 @@
 # Loadbalancing Test
 
-## gRPC
+## 1. Overview
 
-- https://github.com/grpc/grpc-node/tree/master/examples/helloworld
+The situation is that we have two apps, `app-1` and `app-2`, that are connected via gRPC. `app-1` is a frontend app that listens on port `8000`, responds on route `/test` and queries the backend app via gRPC. `app-2` is a backend app that listens on port `8080` (gRPC).
 
-## Openshift
+![Loadbalancing Test](image.png)
 
-- https://docs.openshift.com/container-platform/4.15/networking/routes/route-configuration.html
-- https://kubernetes.io/docs/reference/networking/virtual-ips/#session-affinity
-- https://docs.openshift.com/container-platform/4.15/cli_reference/openshift_cli/developer-cli-commands.html
+## 2. <TL;DR>
 
-## Preparations
+```sh
+# clone repository
+git clone https://github.com/JurajBrabec/loadbalancing-test.git
+cd loadbalancing-test
+
+# create project and apps
+oc new-project loadbalancing-test
+oc apply -f manifests/app-1
+oc apply -f manifests/app-2
+
+# install Operators
+oc apply -f manifests/operators -n openshift-operators
+
+# Install Service Mesh components
+oc create namespace istio-system
+oc apply -f manifests/servicemesh-control-plane.yml -n istio-system
+oc apply -f manifests/servicemesh-member-roll.yml -n istio-system
+
+# NOTE: sometimes, scale down of apps to 0 an then back needed, as sidecars don't deploy. Solution would be to annotate deployments at this stage. I prefer to have them annotated already in manifests.
+
+#oc scale deployment app-1 --replicas=0
+#oc scale deployment app-2 --replicas=0
+#oc scale deployment app-1 --replicas=1
+#oc scale deployment app-2 --replicas=3
+
+oc apply -f manifests/istio-config.yml
+
+# Observe APP_1 route or Kiali route for results.
+```
+
+## 3. Preparations
+
+### 3.1 Path to `oc` command (CRC environment only)
 
 ```sh
 @FOR /f "tokens=*" %i IN ('crc oc-env') DO @call %i
+```
+
+### 3.2 Required permissons
+
+Log in to Openshift as a user with `cluster-admin` rights (for Operators installation).
+
+### 4.4 Clone repository
+
+```sh
 git clone https://github.com/JurajBrabec/loadbalancing-test.git
 cd loadbalancing-test
 ```
 
-### Create project
+## 4. Install applications
+
+### 4.1 Create project
 
 ```sh
 oc new-project loadbalancing-test
 ```
 
-### APP_1
+### 4.2 Install APP_1
 
 Create the frontend app, that listens on port `8000`, responds on route `/test` and queries the backend app via gRPC.
 
@@ -32,7 +73,7 @@ Create the frontend app, that listens on port `8000`, responds on route `/test` 
 oc apply -f manifests/app-1
 ```
 
-#### Optional commands
+#### 4.2.1 Optional commands
 
 Set the environment variable for `app_2` connection
 
@@ -70,7 +111,7 @@ Remove the app
 oc delete all --selector app=app-1
 ```
 
-### APP_2
+### 4.3. Install APP_2
 
 Create the backend service, that listens on port `8080` (gRPC)
 
@@ -78,18 +119,7 @@ Create the backend service, that listens on port `8080` (gRPC)
 oc apply -f manifests/app-2
 ```
 
-### Test the apps
-
-```sh
-oc get route app-1 -o jsonpath='{.spec.host}'
-set URL=<url>
-
-# for /l %l in (0,0,1) do; @curl %URL%/test & echo. & timeout 1 > NUL
-```
-
-Open the `http://<URL>` in browser
-
-#### Optional commands
+#### 4.3.1 Optional commands
 
 Scale the application as needed
 
@@ -109,7 +139,18 @@ Remove the app-2
 oc delete all --selector app=app-2
 ```
 
-### Removal
+### 4.4 Test the applications
+
+```sh
+oc get route app-1 -o jsonpath='{.spec.host}'
+
+#set URL=<url>
+# for /l %l in (0,0,1) do; @curl %URL%/test & echo. & timeout 1 > NUL
+```
+
+Open the `http://<url>` path in browser
+
+### 4.5 Removal
 
 Remove everything at once
 
@@ -118,28 +159,23 @@ oc delete all --selector app.kubernetes.io/part-of=loadbalancing-test
 oc delete project loadbalancing-test
 ```
 
-## Service Mesh
+## 5. Service Mesh
 
-- https://docs.openshift.com/container-platform/4.15/service_mesh/v2x/installing-ossm.html
-- https://developers.redhat.com/articles/2023/01/30/run-app-under-openshift-service-mesh
-- https://www.densify.com/openshift-tutorial/openshift-service-mesh/
-- https://github.com/rhthsa/openshift-demo/blob/main/openshift-service-mesh.md
-
-### Configure CRC
+### 5.1 Configure VM (CRC environment only)
 
 ```sh
 crc config set memory 21504
 crc config set disk-size 62
 ```
 
-### Install Operators
+### 5.2 Install Operators
 
 ```sh
 #oc create namespace openshift-operators
 oc apply -f manifests/operators -n openshift-operators
 ```
 
-#### Check installation process
+#### 5.2.1 Check installation process
 
 List installed subscriptions
 
@@ -168,7 +204,7 @@ oc get csv <csv> -o template --template '{{.status.phase}}'
 #'Succeeded'
 ```
 
-### Install Service Mesh Control Plane
+### 5.3 Install Service Mesh Control Plane
 
 ```sh
 oc create namespace istio-system
@@ -184,7 +220,7 @@ oc get smcp -n istio-system
 #basic   9/9     ComponentsReady   ["default"]   2.5.1     80s
 ```
 
-### Install Service Mesh Member Roll
+### 5.4 Install Service Mesh Member Roll
 
 ```sh
 oc apply -f manifests/servicemesh-member-roll.yml -n istio-system
@@ -204,7 +240,7 @@ oc get smm
 #default   istio-system/basic   True    5s
 ```
 
-### Istio configuration
+### 5.5 Istio configuration
 
 - https://istio.io/latest/docs/reference/config/networking/
 - https://istio.io/latest/docs/concepts/traffic-management/#load-balancing-options
@@ -213,15 +249,41 @@ oc get smm
 oc apply -f manifests/istio-config.yml
 ```
 
-### Open the Kiali console
+### 5.6 Open the Kiali console in browser
 
 ```sh
 oc get route kiali -n istio-system -o jsonpath='{.spec.host}'
 ```
 
-### Service Mesh Removal
+Open the `http://<url>` path in browser
+
+### 5.7 Service Mesh Removal
 
 ```sh
 oc delete namespace istio-system
 oc delete -f manifests/operators -n openshift-operators
 ```
+
+## 6. References
+
+### 6.1 gRPC
+
+- https://github.com/grpc/grpc-node/tree/master/examples/helloworld
+
+### 6.2 Openshift
+
+- https://docs.openshift.com/container-platform/4.15/networking/routes/route-configuration.html
+- https://kubernetes.io/docs/reference/networking/virtual-ips/#session-affinity
+- https://docs.openshift.com/container-platform/4.15/cli_reference/openshift_cli/developer-cli-commands.html
+
+### 6.3 Service Mesh
+
+- https://docs.openshift.com/container-platform/4.15/service_mesh/v2x/installing-ossm.html
+- https://developers.redhat.com/articles/2023/01/30/run-app-under-openshift-service-mesh
+- https://www.densify.com/openshift-tutorial/openshift-service-mesh/
+- https://github.com/rhthsa/openshift-demo/blob/main/openshift-service-mesh.md
+
+### 6.4 Istio
+
+- https://istio.io/latest/docs/reference/config/networking/
+- https://istio.io/latest/docs/concepts/traffic-management/#load-balancing-options
