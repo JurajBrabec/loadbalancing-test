@@ -10,6 +10,10 @@ const client = createClient(APP_2_ADDR);
 const app = express();
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
+});
+
 app.get('/test', (request, response) => {
   const name = request.query.name || hostname;
   client.serve({ name }, function (error, result) {

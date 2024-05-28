@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Loadbalancing test</title>
+  </head>
+  <body>
+    <h2>Queries: <span id="counter">0</span></h2>
+    <h2>Last response: <span id="response"></span></h2>
+    <h2>Nodes: <span id="nodes"></span></h2>
+    <button onclick="resetCounter()">Reset Counter</button>
+
+    <script>
+      async function fetch1s(resource) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), 500);
+
+        const response = await fetch(resource, { signal: controller.signal });
+        clearTimeout(id);
+
+        return response;
+      }
+
+      let count = 0;
+      let message = '';
+      let text = '';
+      const queries = new Map();
+
+      const counterElement = document.getElementById('counter');
+      const responseElement = document.getElementById('response');
+      const nodesElement = document.getElementById('nodes');
+
+      async function incrementCounter() {
+        try {
+          count++;
+
+          const response = await fetch1s('/test');
+          json = await response.json();
+          message = json.message;
+          if (response.ok) {
+            const node1 = message.split(' ')[0].split('@')[1];
+            const node2 = message.split(' ')[2].split('@')[1];
+            queries.set(node1, (queries.get(node1) || 0) + 1);
+            if (node2 !== node1)
+              queries.set(node2, (queries.get(node2) || 0) + 1);
+          }
+          text = '';
+          for (const [node, counter] of queries) {
+            text += `${node} (${Math.floor((100 * counter) / count)}%)`;
+          }
+        } catch (error) {
+          console.error(error);
+          text = error;
+        }
+
+        counterElement.textContent = count;
+        responseElement.textContent = message;
+        nodesElement.textContent = text;
+      }
+
+      function resetCounter() {
+        count = 0;
+        queries.clear();
+
+        counterElement.textContent = count;
+        responseElement.textContent = '';
+        nodesElement.textContent = '';
+      }
+
+      setInterval(incrementCounter, 1000);
+    </script>
+  </body>
+</html>
