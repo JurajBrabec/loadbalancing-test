@@ -26,8 +26,8 @@ spec:
         version: v1
     spec:
       containers:
-        image: 'image-registry.openshift-image-registry.svc:5000/loadbalancing-test/app-2'
-        name: app-2
-        ports:
-          - containerPort: 8080
-            protocol: TCP
+        - image: 'image-registry.openshift-image-registry.svc:5000/loadbalancing-test/app-2'
+          name: app-2
+          ports:
+            - containerPort: 8080
+              protocol: TCP
