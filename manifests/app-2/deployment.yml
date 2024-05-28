@@ -3,6 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
+    app.openshift.io/vcs-uri: 'https://github.com/JurajBrabec/loadbalancing-test.git'
     image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"app-2:latest"},"fieldPath":"spec.template.spec.containers[?(@.name==\"app-2\")].image"}]'
   labels:
     app: app-2
