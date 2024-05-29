@@ -8,12 +8,15 @@ const PORT = 8000;
 const app = express();
 app.use(express.json());
 
+const client = createClient(APP_2_ADDR);
+
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
 app.get('/test', (request, response) => {
-  const client = createClient(APP_2_ADDR);
+  //NOTE - this would work as expected, but the client must be created outside the handler
+  //  const client = createClient(APP_2_ADDR);
   const name = request.query.name || hostname;
   client.serve({ name }, function (error, result) {
     if (error) {
@@ -22,7 +25,7 @@ app.get('/test', (request, response) => {
       return response.status(500).json({ message });
     }
     const { message } = result;
-    client.close();
+    //    client.close();
     return response.status(200).json({ message });
   });
 });

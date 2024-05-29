@@ -5,8 +5,8 @@
   </head>
   <body>
     <h2>Queries: <span id="counter">0</span></h2>
-    <h2>Last response: <span id="response"></span></h2>
-    <h2>Nodes: <span id="nodes"></span></h2>
+    <h3>Last response: <span id="response"></span></h3>
+    <h3>Nodes: <span id="nodes"></span></h3>
     <button onclick="resetCounter()">Reset Counter</button>
 
     <script>
@@ -43,10 +43,11 @@
             if (node2 !== node1)
               queries.set(node2, (queries.get(node2) || 0) + 1);
           }
-          text = '';
+          nodes = [];
           for (const [node, counter] of queries) {
-            text += `${node} (${Math.floor((100 * counter) / count)}%)`;
+            nodes.push(`${node} (${Math.floor((100 * counter) / count)}%)`);
           }
+          text = nodes.join(',');
         } catch (error) {
           console.error(error);
           text = error;
