@@ -14,7 +14,8 @@ spec:
   source:
     contextDir: /
     git:
-      uri: https://github.com/JurajBrabec/loadbalancing-test.git#working
+      uri: https://github.com/JurajBrabec/loadbalancing-test.git
+      ref: working
     type: Git
   strategy:
     dockerStrategy:
