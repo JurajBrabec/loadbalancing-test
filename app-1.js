@@ -20,11 +20,9 @@ app.get('/test', (request, response) => {
     if (error) {
       const { message } = error;
       console.error('Error:', message);
-      client.close();
       return response.status(500).json({ message });
     }
     const { message } = result;
-    client.close();
     return response.status(200).json({ message });
   });
 });
