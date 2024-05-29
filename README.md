@@ -29,10 +29,6 @@ oc apply -f manifests/app-2
 @FOR /f "tokens=*" %i IN ('crc oc-env') DO @call %i
 ```
 
-### 3.2 Required permissons
-
-Log in to Openshift as a user with `cluster-admin` rights (for Operators installation).
-
 ### 4.4 Clone repository
 
 ```sh
