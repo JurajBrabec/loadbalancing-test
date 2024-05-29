@@ -32,7 +32,13 @@
       const responseElement = document.getElementById('response');
       const app1Element = document.getElementById('app-1');
       const app2Element = document.getElementById('app-2');
-
+      const listHosts = (hostsMap) => {
+        const hosts = [];
+        for (const [host, counter] of hostsMap) {
+          hosts.push(`${host} (${Math.floor((100 * counter) / count)}%)`);
+        }
+        return hosts.join(',');
+      };
       async function incrementCounter() {
         try {
           const response = await fetch1s('/test');
@@ -40,21 +46,13 @@
           message = json.message;
           if (response.ok) {
             count++;
-            const app1Host = message.split(' ')[0].split('@')[1];
-            const app2Host = message.split(' ')[2].split('@')[1];
+            const app2Host = message.split(' ')[0].split('@')[1];
+            const app1Host = message.split(' ')[2].split('@')[1];
             app1Hosts.set(app1Host, (app1Hosts.get(app1Host) || 0) + 1);
             app2Hosts.set(app2Host, (app2Hosts.get(app2Host) || 0) + 1);
           }
-          let hosts = [];
-          for (const [host, counter] of app1Hosts) {
-            hosts.push(`${host} (${Math.floor((100 * counter) / count)}%)`);
-          }
-          app1 = hosts.join(',');
-          hosts = [];
-          for (const [host, counter] of app2Hosts) {
-            hosts.push(`${host} (${Math.floor((100 * counter) / count)}%)`);
-          }
-          app2 = hosts.join(',');
+          app1 = listHosts(app1Hosts);
+          app2 = listHosts(app2Hosts);
         } catch (error) {
           console.error(error);
         }
