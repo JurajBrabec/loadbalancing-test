@@ -12,6 +12,7 @@ The situation is that we have two apps, `app-1` and `app-2`, that are connected 
 # clone repository
 git clone https://github.com/JurajBrabec/loadbalancing-test.git
 cd loadbalancing-test
+git checkout working
 
 # create project and apps
 oc new-project loadbalancing-test
