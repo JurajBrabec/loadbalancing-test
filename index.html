@@ -6,7 +6,8 @@
   <body>
     <h2>Queries: <span id="counter">0</span></h2>
     <h3>Last response: <span id="response"></span></h3>
-    <h3>Nodes: <span id="nodes"></span></h3>
+    <h3>APP_1 nodes: <span id="app-1"></span></h3>
+    <h3>APP_2 nodes: <span id="app-2"></span></h3>
     <button onclick="resetCounter()">Reset Counter</button>
 
     <script>
@@ -22,49 +23,57 @@
 
       let count = 0;
       let message = '';
-      let text = '';
-      const queries = new Map();
+      let app1 = '';
+      let app2 = '';
+      const app1Hosts = new Map();
+      const app2Hosts = new Map();
 
       const counterElement = document.getElementById('counter');
       const responseElement = document.getElementById('response');
-      const nodesElement = document.getElementById('nodes');
+      const app1Element = document.getElementById('app-1');
+      const app2Element = document.getElementById('app-2');
 
       async function incrementCounter() {
         try {
-          count++;
-
           const response = await fetch1s('/test');
           json = await response.json();
           message = json.message;
           if (response.ok) {
-            const node1 = message.split(' ')[0].split('@')[1];
-            const node2 = message.split(' ')[2].split('@')[1];
-            queries.set(node1, (queries.get(node1) || 0) + 1);
-            if (node2 !== node1)
-              queries.set(node2, (queries.get(node2) || 0) + 1);
+            count++;
+            const app1Host = message.split(' ')[0].split('@')[1];
+            const app2Host = message.split(' ')[2].split('@')[1];
+            app1Hosts.set(app1Host, (app1Hosts.get(app1Host) || 0) + 1);
+            app2Hosts.set(app2Host, (app2Hosts.get(app2Host) || 0) + 1);
           }
-          nodes = [];
-          for (const [node, counter] of queries) {
-            nodes.push(`${node} (${Math.floor((100 * counter) / count)}%)`);
+          let hosts = [];
+          for (const [host, counter] of app1Hosts) {
+            hosts.push(`${host} (${Math.floor((100 * counter) / count)}%)`);
           }
-          text = nodes.join(',');
+          app1 = hosts.join(',');
+          hosts = [];
+          for (const [host, counter] of app2Hosts) {
+            hosts.push(`${host} (${Math.floor((100 * counter) / count)}%)`);
+          }
+          app2 = hosts.join(',');
         } catch (error) {
           console.error(error);
-          text = error;
         }
 
         counterElement.textContent = count;
         responseElement.textContent = message;
-        nodesElement.textContent = text;
+        app1Element.textContent = app1;
+        app2Element.textContent = app2;
       }
 
       function resetCounter() {
         count = 0;
-        queries.clear();
+        app1Hosts.clear();
+        app2Hosts.clear();
 
         counterElement.textContent = count;
         responseElement.textContent = '';
-        nodesElement.textContent = '';
+        app1Element.textContent = '';
+        app2Element.textContent = '';
       }
 
       setInterval(incrementCounter, 1000);
