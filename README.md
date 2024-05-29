@@ -287,3 +287,12 @@ oc delete -f manifests/operators -n openshift-operators
 
 - https://istio.io/latest/docs/reference/config/networking/
 - https://istio.io/latest/docs/concepts/traffic-management/#load-balancing-options
+
+istioctl install --set profile=openshift
+
+istioctl uninstall -y --purge
+oc delete ns istio-system istio-operator
+
+oc -n istio-system expose svc/istio-ingressgateway --port=http2
+
+oc label namespace loadbalancing-test istio-injection=enabled
