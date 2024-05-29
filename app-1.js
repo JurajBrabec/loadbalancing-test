@@ -5,8 +5,6 @@ const { createClient } = require('./grpc');
 const APP_2_ADDR = process.env.APP_2_ADDR || '0.0.0.0:8080';
 const PORT = 8000;
 
-const client = createClient(APP_2_ADDR);
-
 const app = express();
 app.use(express.json());
 
@@ -15,6 +13,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/test', (request, response) => {
+  const client = createClient(APP_2_ADDR);
   const name = request.query.name || hostname;
   client.serve({ name }, function (error, result) {
     if (error) {
