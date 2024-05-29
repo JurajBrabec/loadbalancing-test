@@ -12,11 +12,7 @@ const packageDefinition = protoLoader.loadSync('grpc.proto', {
 const proto = grpc.loadPackageDefinition(packageDefinition).app_2;
 
 const createClient = (address) => {
-  return new proto.App_2(address, grpc.credentials.createInsecure(), {
-    'grpc.keepalive_time_ms': 10000, // 10 seconds
-    'grpc.keepalive_timeout_ms': 5000, // 5 seconds
-    'grpc.keepalive_permit_without_calls': 1,
-  });
+  return new proto.App_2(address, grpc.credentials.createInsecure());
 };
 
 const createServer = (address, serve) => {
