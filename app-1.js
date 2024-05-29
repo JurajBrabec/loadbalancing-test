@@ -22,6 +22,7 @@ app.get('/test', (request, response) => {
       return response.status(500).json({ message });
     }
     const { message } = result;
+    client.close();
     return response.status(200).json({ message });
   });
 });
