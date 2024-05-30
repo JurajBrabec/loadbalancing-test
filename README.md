@@ -151,6 +151,9 @@ oc delete project loadbalancing-test
 ## 5. Envoy
 
 - https://www.envoyproxy.io/docs/envoy/latest/start/install
+- https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/other_protocols/grpc
+- https://grpc.io/docs/platforms/web/basics/#configure-the-envoy-proxy
+- https://www.redhat.com/en/blog/configuring-envoy-auto-discover-pods-kubernetes
 
 ### 5.1 Install Envoy and modify APP_1 to use it
 

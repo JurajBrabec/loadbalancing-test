@@ -60,5 +60,5 @@ data:
               - endpoint:
                   address:
                     socket_address:
-                      address: app_2
+                      address: app-2-headless
                       port_value: 8080
