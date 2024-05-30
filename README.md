@@ -296,3 +296,10 @@ oc delete ns istio-system istio-operator
 oc -n istio-system expose svc/istio-ingressgateway --port=http2
 
 oc label namespace loadbalancing-test istio-injection=enabled
+
+## 7 Linkrd
+
+linkerd check --pre
+linkerd install --crds | oc apply -f -
+linkerd install | oc apply -f -
+linkerd check

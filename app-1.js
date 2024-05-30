@@ -8,9 +8,6 @@ const PORT = 8000;
 const app = express();
 app.use(express.json());
 
-//NOTE - When the gRPC client is created on application start, and closed on exit,
-//       the TCP connection will remain established after first use in the handler,
-//       therefore Openshift Service load balancing is technically not possible.
 const client = createClient(APP_2_ADDR);
 
 app.get('/', (req, res) => {
@@ -18,9 +15,6 @@ app.get('/', (req, res) => {
 });
 
 app.get('/test', (request, response) => {
-  //NOTE - Openshift Service load balancing will work as expected only if
-  //       the gRPC client will be created inside the handler and closed ASAP
-  //       const client = createClient(APP_2_ADDR);
   const name = request.query.name || hostname;
   client.serve({ name }, function (error, result) {
     if (error) {
@@ -31,7 +25,6 @@ app.get('/test', (request, response) => {
       const { message } = result;
       response.status(200).json({ message });
     }
-    // client.close();
   });
 });
 

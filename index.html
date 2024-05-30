@@ -40,8 +40,8 @@
           message = json.message;
           if (response.ok) {
             count++;
-            const app1Host = message.split(' ')[0].split('@')[1];
-            const app2Host = message.split(' ')[2].split('@')[1];
+            const app2Host = message.split(' ')[0].split('@')[1];
+            const app1Host = message.split(' ')[2].split('@')[1];
             app1Hosts.set(app1Host, (app1Hosts.get(app1Host) || 0) + 1);
             app2Hosts.set(app2Host, (app2Hosts.get(app2Host) || 0) + 1);
           }
