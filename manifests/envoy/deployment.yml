@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.openshift.io/connects-to: 'app-2'
+    app.openshift.io/vcs-uri: 'https://github.com/JurajBrabec/loadbalancing-test.git'
+  labels:
+    app: envoy
+    app.kubernetes.io/part-of: loadbalancing-test
+  name: envoy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: envoy
+      app.kubernetes.io/part-of: loadbalancing-test
+      deployment: envoy
+  template:
+    metadata:
+      labels:
+        app: envoy
+        app.kubernetes.io/part-of: loadbalancing-test
+        deployment: envoy
+    spec:
+      containers:
+        - name: envoy
+          image: envoyproxy/envoy:v1.30-latest
+          volumeMounts:
+            - name: envoy-config
+              mountPath: /etc/envoy/envoy.yaml
+              subPath: envoy.yaml
+          ports:
+            - containerPort: 8080
+          command: ['/usr/local/bin/envoy']
+          args: ['-c', '/etc/envoy/envoy.yaml']
+      volumes:
+        - name: envoy-config
+          configMap:
+            name: envoy-config

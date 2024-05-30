@@ -300,6 +300,22 @@ oc label namespace loadbalancing-test istio-injection=enabled
 ## 7 Linkrd
 
 linkerd check --pre
+linkerd install-cni | oc apply -f -
+
+> spec template spec containers securityContext: readOnlyRootFilesystem: false privileged: true
+
+oc apply -f manifests\linkerd.yml
+oc adm policy add-scc-to-user linkerd-cni-scc -z linkerd-cni -n linkerd-cni
+
 linkerd install --crds | oc apply -f -
-linkerd install | oc apply -f -
+linkerd install --linkerd-cni-enabled | oc apply -f -
 linkerd check
+
+linkerd uninstall | oc delete -f -
+
+### 8 Envoy
+
+https://www.envoyproxy.io/docs/envoy/latest/start/install
+
+oc apply -f manifests\envoy
+oc set env deployment app-1 APP_2_ADDR=envoy:8080

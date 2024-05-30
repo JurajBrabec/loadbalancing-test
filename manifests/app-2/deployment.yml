@@ -18,13 +18,10 @@ spec:
       deployment: app-2
   template:
     metadata:
-      annotations:
-        sidecar.istio.io/inject: 'true'
       labels:
         app: app-2
         app.kubernetes.io/part-of: loadbalancing-test
         deployment: app-2
-        version: v1
     spec:
       containers:
         - image: 'image-registry.openshift-image-registry.svc:5000/loadbalancing-test/app-2'
