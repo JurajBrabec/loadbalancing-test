@@ -1,0 +1,41 @@
+---
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: linkerd-cni-scc
+allowHostDirVolumePlugin: true
+allowHostIPC: false
+allowHostNetwork: true
+allowHostPID: false
+allowHostPorts: true
+allowPrivilegeEscalation: true
+allowPrivilegedContainer: true
+allowedCapabilities:
+  - NET_ADMIN
+  - NET_RAW
+defaultAddCapabilities: []
+fsGroup:
+  type: RunAsAny
+groups: []
+priority: 10
+readOnlyRootFilesystem: false
+requiredDropCapabilities: []
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: MustRunAs
+seccompProfiles:
+  - docker/default
+#  - runtime/default
+#  - unconfined
+supplementalGroups:
+  type: RunAsAny
+users: []
+volumes:
+  - configMap
+  - downwardAPI
+  - emptyDir
+  - hostPath
+  - persistentVolumeClaim
+  - projected
+  - secret

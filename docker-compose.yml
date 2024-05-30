@@ -1,0 +1,28 @@
+services:
+  app_1:
+    build:
+      context: .
+      dockerfile: Dockerfile-app-1
+    container_name: app-1
+    depends_on:
+      - envoy
+    environment:
+      - APP_2_ADDR=envoy:8080
+    ports:
+      - '8000:8000'
+  app_2:
+    build:
+      context: .
+      dockerfile: Dockerfile-app-2
+    container_name: app-2
+    expose:
+      - 8080
+  envoy:
+    container_name: envoy
+    depends_on:
+      - app_2
+    expose:
+      - 8080
+    image: envoyproxy/envoy:v1.30-latest
+    volumes:
+      - './manifests/envoy/envoy.yaml.txt:/etc/envoy/envoy.yaml'
