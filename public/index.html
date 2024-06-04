@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Loadbalancing test</title>
+  </head>
+  <body>
+    <script src="index.js" defer></script>
+    <h2>Queries: <span id="counter">0</span></h2>
+    <h3>Last response: <span id="response"></span></h3>
+    <h3>APP_1 nodes: <span id="app-1"></span></h3>
+    <h3>APP_2 nodes: <span id="app-2"></span></h3>
+    <h3>
+      Interval:
+      <input
+        id="interval"
+        type="text"
+        value="1000"
+        onchange="changeInterval(event)"
+      />
+    </h3>
+    <button onclick="resetCounter()">Reset Counter</button>
+  </body>
+</html>

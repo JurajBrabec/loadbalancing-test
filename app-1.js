@@ -10,9 +10,7 @@ app.use(express.json());
 
 const client = createClient(APP_2_ADDR);
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
+app.use(express.static('public'));
 
 app.get('/test', (request, response) => {
   const name = request.query.name || hostname;

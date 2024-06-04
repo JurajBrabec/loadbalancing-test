@@ -4,7 +4,7 @@
 
 The situation is that we have two apps, `app-1` and `app-2`, that are connected via gRPC. `app-1` is a frontend app that listens on port `8000`, responds on route `/test` and queries the backend app via gRPC. `app-2` is a backend app that listens on port `8080` (gRPC).
 
-![Loadbalancing Test](image.png)
+![Loadbalancing Test](public/image.png)
 
 ## 2. <TL;DR>
 
