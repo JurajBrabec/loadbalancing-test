@@ -18,4 +18,4 @@ RUN apk add --update \
     ssh-keygen -A
 
 EXPOSE 22 8000 8080
-CMD sh /.init/entrypoint.sh && sh /.init/daemon.sh
+CMD sh /.init/entrypoint.sh; sh /.init/daemon.sh
