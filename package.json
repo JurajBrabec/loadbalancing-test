@@ -2,7 +2,7 @@
   "name": "servicemesh-test",
   "version": "1.0.0",
   "description": "",
-  "main": "read.me",
+  "main": "app-1.js",
   "scripts": {
     "dev:app-1": "node app-1.js",
     "dev:app-2": "node app-2.js"
