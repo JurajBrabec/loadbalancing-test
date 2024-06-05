@@ -11,6 +11,7 @@ RUN chmod -R 755 /.init
 
 # Install dependencies
 RUN apk add --update \
+    sudo \
     openssh \
     mc \
     git && \
