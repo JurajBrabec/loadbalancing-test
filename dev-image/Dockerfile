@@ -11,9 +11,9 @@ ADD . /.init
 RUN chown -R root:root /.init
 RUN chmod -R 755 /.init
 
-RUN mkdir -p /.vscode
-RUN chown -R 1000740000:root /.vscode
-RUN chmod -R 775 /.vscode
+RUN mkdir -p /.vscode-server
+RUN chown -R 1000740000:root /.vscode-server
+RUN chmod -R 775 /.vscode-server
 
 WORKDIR /opt/code-base
 RUN chown -R 1000740000:root .
