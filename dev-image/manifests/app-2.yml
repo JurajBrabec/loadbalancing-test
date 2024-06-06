@@ -3,40 +3,37 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    app.openshift.io/connects-to: 'app-2'
     app.openshift.io/vcs-uri: 'https://github.com/JurajBrabec/loadbalancing-test.git'
   labels:
-    app: app-1
+    app: app-2
     app.kubernetes.io/part-of: loadbalancing-test
-  name: app-1
+  name: app-2
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
-      app: app-1
+      app: app-2
       app.kubernetes.io/part-of: loadbalancing-test
-      deployment: app-1
+      deployment: app-2
   template:
     metadata:
       labels:
-        app: app-1
+        app: app-2
         app.kubernetes.io/part-of: loadbalancing-test
-        deployment: app-1
+        deployment: app-2
     spec:
       containers:
         - command:
             [
               'sh',
               '-c',
-              'cd /opt/code-base && npm install && npm run dev:app-1',
+              'cd /opt/code-base && npm install && npm run dev:app-2',
             ]
           env:
-            - name: APP_2_ADDR
-              value: 'app-2:8080'
             - name: DEV_MODE
               value: 'true'
           image: registry.access.redhat.com/ubi8/nodejs-20
-          name: app-1
+          name: app-2
           volumeMounts:
             - name: code-base
               mountPath: /opt/code-base
@@ -50,9 +47,9 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: app-1
+    app: app-2
     app.kubernetes.io/part-of: loadbalancing-test
-  name: app-1-debugger
+  name: app-2-debugger
 spec:
   ports:
     - name: 5858-tcp
@@ -60,6 +57,6 @@ spec:
       port: 5858
       targetPort: 5858
   selector:
-    app: app-1
+    app: app-2
     app.kubernetes.io/part-of: loadbalancing-test
-    deployment: app-1
+    deployment: app-2
