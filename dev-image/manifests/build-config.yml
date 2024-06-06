@@ -1,16 +1,11 @@
 ---
-kind: BuildConfig
 apiVersion: build.openshift.io/v1
+kind: BuildConfig
 metadata:
-  annotations:
-    app.openshift.io/vcs-uri: 'https://github.com/JurajBrabec/loadbalancing-test.git'
-  name: dev-image
   labels:
     app: dev-image
-    app.kubernetes.io/component: dev-image
-    app.kubernetes.io/instance: dev-image
-    app.kubernetes.io/name: dev-image
     app.kubernetes.io/part-of: loadbalancing-test
+  name: dev-image
 spec:
   output:
     to:
@@ -18,12 +13,15 @@ spec:
       name: 'dev-image:latest'
   successfulBuildsHistoryLimit: 1
   failedBuildsHistoryLimit: 1
-  strategy:
-    type: Docker
-    dockerStrategy:
-      dockerfilePath: Dockerfile
   source:
-    type: Git
+    contextDir: /dev-image
     git:
       uri: 'https://github.com/JurajBrabec/loadbalancing-test.git'
-    contextDir: /dev-image
+    type: Git
+  strategy:
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+    type: Docker
+  triggers:
+    - type: ConfigChange
+    - type: ImageChange
