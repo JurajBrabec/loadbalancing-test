@@ -3,7 +3,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    app.openshift.io/connects-to: 'envoy'
     app.openshift.io/vcs-uri: 'https://github.com/JurajBrabec/loadbalancing-test.git'
   labels:
     app: app-1
@@ -28,13 +27,14 @@ spec:
             [
               'sh',
               '-c',
-              'cd /opt/code-base/loadbalancing-test && npm install && npm run dev:app-1',
+              'cd /opt/code-base && npm install && npm run dev:app-1',
             ]
-          image: node:20
+          image: registry.access.redhat.com/ubi8/nodejs-20
           name: dev
           volumeMounts:
             - name: code-base
               mountPath: /opt/code-base
+              subPath: loadbalancing-test
       volumes:
         - name: code-base
           persistentVolumeClaim:
