@@ -4,7 +4,7 @@
   "description": "",
   "main": "app-1.js",
   "scripts": {
-    "dev:app-1": "nodemon app-1.js",
+    "dev:app-1": "nodemon --inspect -L app-1.js",
     "dev:app-2": "nodemon app-2.js"
   },
   "keywords": [],
