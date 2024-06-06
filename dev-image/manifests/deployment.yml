@@ -40,16 +40,16 @@ spec:
       #   - mountPath: /mnt/code-base
       #     name: code-base
       containers:
-        - name: dev-image
-          image: ' '
+        - image: ' '
           imagePullPolicy: Always
-          volumeMounts:
-            - name: code-base
-              mountPath: /opt/code-base
+          name: dev-image
           resources:
             limits:
               cpu: 500m
               memory: 512Mi
+          volumeMounts:
+            - name: code-base
+              mountPath: /opt/code-base
       # securityContext:
       #   allowPrivilegeEscalation: false
       #   capabilities:

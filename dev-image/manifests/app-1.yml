@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.openshift.io/connects-to: 'envoy'
+    app.openshift.io/vcs-uri: 'https://github.com/JurajBrabec/loadbalancing-test.git'
+  labels:
+    app: app-1
+    app.kubernetes.io/part-of: loadbalancing-test
+  name: app-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-1
+      app.kubernetes.io/part-of: loadbalancing-test
+      deployment: app-1
+  template:
+    metadata:
+      labels:
+        app: app-1
+        app.kubernetes.io/part-of: loadbalancing-test
+        deployment: app-1
+    spec:
+      containers:
+        - command:
+            [
+              'sh',
+              '-c',
+              'cd /opt/code-base/loadbalancing-test && npm install && npm run dev:app-1',
+            ]
+          image: node:20
+          name: dev
+          volumeMounts:
+            - name: code-base
+              mountPath: /opt/code-base
+      volumes:
+        - name: code-base
+          persistentVolumeClaim:
+            claimName: code-base
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: app-1
+    app.kubernetes.io/part-of: loadbalancing-test
+  name: app-1
+spec:
+  ports:
+    - name: 5858-tcp
+      protocol: TCP
+      port: 5858
+      targetPort: 5858
+  selector:
+    app: app-1
+    app.kubernetes.io/part-of: loadbalancing-test
+    deployment: app-1

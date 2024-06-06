@@ -28,7 +28,8 @@ spec:
         - env:
             - name: APP_2_ADDR
               value: 'app-2:8080'
-          image: 'image-registry.openshift-image-registry.svc:5000/loadbalancing-test/app-1'
+          image: ' '
+          imagePullPolicy: Always
           name: app-1
           ports:
             - containerPort: 8000
