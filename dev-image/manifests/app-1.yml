@@ -29,6 +29,9 @@ spec:
               '-c',
               'cd /opt/code-base && npm install && npm run dev:app-1',
             ]
+          env:
+            - name: DEV_MODE
+              value: 'true'
           image: registry.access.redhat.com/ubi8/nodejs-20
           name: dev
           volumeMounts:
