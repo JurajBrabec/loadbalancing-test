@@ -12,7 +12,7 @@ RUN chmod -R 755 /.init
 # Install dependencies
 RUN apt update && apt install -y \
     sudo \
-    openssh \
+    openssh-server \
     mc \
     git \
     ; \
