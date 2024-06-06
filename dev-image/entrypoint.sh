@@ -1,4 +1,4 @@
-#!/bin/ash
+#!/bin/bash
 
 # Set SSH password
 echo root:${SSH_PASSWORD:-password} | sudo chpasswd
