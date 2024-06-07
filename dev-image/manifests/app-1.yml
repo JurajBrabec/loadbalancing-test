@@ -37,6 +37,9 @@ spec:
               value: 'true'
           image: registry.access.redhat.com/ubi8/nodejs-20
           name: app-1
+          ports:
+            - containerPort: 8000
+              protocol: TCP
           volumeMounts:
             - name: code-base
               mountPath: /opt/code-base
