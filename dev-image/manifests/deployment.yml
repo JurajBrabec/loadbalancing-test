@@ -8,19 +8,19 @@ metadata:
   name: dev-image
   labels:
     app: dev-image
-    app.kubernetes.io/part-of: loadbalancing-test
+    app.kubernetes.io/part-of: excalibur-v4-dev
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: dev-image
-      app.kubernetes.io/part-of: loadbalancing-test
+      app.kubernetes.io/part-of: excalibur-v4-dev
       deployment: dev-image
   template:
     metadata:
       labels:
         app: dev-image
-        app.kubernetes.io/part-of: loadbalancing-test
+        app.kubernetes.io/part-of: excalibur-v4-dev
         deployment: dev-image
     spec:
       # initContainers:
@@ -30,7 +30,7 @@ spec:
       #       [
       #         'sh',
       #         '-c',
-      #         'chmod -R 777 /mnt/code-base && chown -R nobody:nogroup /mnt/code-base',
+      #         'chmod -R 775 /mnt/code-base,
       #       ]
       #     resources:
       #       limits:

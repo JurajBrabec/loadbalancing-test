@@ -4,7 +4,7 @@ kind: BuildConfig
 metadata:
   labels:
     app: dev-image
-    app.kubernetes.io/part-of: loadbalancing-test
+    app.kubernetes.io/part-of: excalibur-v4-dev
   name: dev-image
 spec:
   output:

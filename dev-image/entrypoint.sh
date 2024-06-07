@@ -7,6 +7,11 @@ echo "Reseting permissions for ${HOME}"
 chown -R openshift:root ${HOME} >/dev/null 2>&1
 chmod -R 775 ${HOME} >/dev/null 2>&1
 
+tee ~/.npmrc <<EOF
+//npm.pkg.github.com/:_authToken=${GITHUB_PAT}
+@excalibur-enterprise:registry=https://npm.pkg.github.com
+EOF
+
 echo "Starting daemon $(date)"
 
 # Create daemon process

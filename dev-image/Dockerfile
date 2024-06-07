@@ -3,6 +3,9 @@ FROM node:20
 ARG PERSISTENT_VOLUME=/opt/code-base
 ARG OPENSHIFT_HOME=${PERSISTENT_VOLUME}/home
 ARG OPENSHIFT_UID=1000730000
+ARG GITHUB_PAT=ghp_*
+
+ENV GITHUB_PAT=${GITHUB_PAT}
 
 USER root
 RUN apt-get update; \
@@ -14,7 +17,7 @@ RUN apt-get update; \
     ; \
     apt-get clean
 
-ADD . /.init
+ADD ./entrypoint.sh /.init
 RUN chown -R root:root /.init; chmod -R 755 /.init
 RUN chmod 775 /etc/passwd
 RUN useradd -D -s /usr/bin/bash

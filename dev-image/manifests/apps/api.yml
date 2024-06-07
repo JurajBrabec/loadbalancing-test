@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    app.openshift.io/connects-to: 'core'
+    app.openshift.io/connects-to: '["cache","core"]'
     app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
   labels:
     app: api
@@ -43,13 +43,16 @@ spec:
             - containerPort: 8080
               protocol: TCP
           resources:
+            requests:
+              cpu: '0.1'
+              memory: '64Mi'
             limits:
               cpu: '1'
               memory: '512Mi'
           volumeMounts:
             - name: code-base
               mountPath: /opt/excalibur/api
-              subPath: lbt1
+              subPath: excalibur-v4/services/api
             - name: code-base
               mountPath: /var/excalibur/pam/recordings
               subPath: volumes/pam-recordings
