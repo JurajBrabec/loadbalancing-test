@@ -35,6 +35,11 @@ spec:
               value: 'false'
             - name: DEV_MODE
               value: 'true'
+            - name: GITHUB_PAT
+              valueFrom:
+                secretKeyRef:
+                  name: github-pat
+                  key: token
           image: registry.access.redhat.com/ubi8/nodejs-20
           name: api
           ports:
@@ -56,10 +61,16 @@ spec:
             - name: code-base
               mountPath: /var/excalibur/pam/recordings
               subPath: volumes/pam-recordings
+            - name: npmrc-config
+              mountPath: /opt/app-root/src/.npmrc
+              subPath: .npmrc
       volumes:
         - name: code-base
           persistentVolumeClaim:
             claimName: code-base
+        - name: npmrc-config
+          configMap:
+            name: npmrc-config
 ---
 apiVersion: v1
 kind: Service

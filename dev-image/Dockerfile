@@ -19,7 +19,7 @@ RUN apt-get update; \
 
 ADD ./entrypoint.sh /.init
 RUN chown -R root:root /.init; chmod -R 755 /.init
-RUN chmod 775 /etc/passwd
+RUN chmod g+w /etc/passwd
 RUN useradd -D -s /usr/bin/bash
 RUN groupadd -g ${OPENSHIFT_UID} openshift; useradd -m -d ${OPENSHIFT_HOME} -s /usr/bin/bash -u ${OPENSHIFT_UID} -g root openshift
 
