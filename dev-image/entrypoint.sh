@@ -1,14 +1,14 @@
 #!/bin/bash
+echo "DEV Image"
 
-# default bash for current user id in passwd file
-echo "DEV Image - Default shell for current user ID in passwd file"
-# usermod -s /bin/bash $(whoami)
-cat /etc/passwd | grep $(whoami)
+# Add group write permissions to $HOME folder to be able to delete old files when Openshift user ID changes again
+echo "Reseting permissions for ${HOME}"
 
-echo "DEV Image - Reseting permissions"
-chown -R openshift:root /opt/code-base; chmod -R 775 /opt/code-base
+chown -R openshift:root ${HOME} >/dev/null 2>&1
+chmod -R 775 ${HOME} >/dev/null 2>&1
 
-echo "DEV Image - Starting daemon"
+echo "Starting daemon $(date)"
+
 # Create daemon process
 while true
 do

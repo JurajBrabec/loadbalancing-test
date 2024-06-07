@@ -1,4 +1,6 @@
 FROM node:20
+ARG OPENSHIFT_HOME=/opt/code-base
+ARG OPENSHIFT_UID=1000730000
 
 USER root
 RUN apt-get update; \
@@ -13,16 +15,12 @@ RUN apt-get update; \
 ADD . /.init
 RUN chown -R root:root /.init; chmod -R 755 /.init
 RUN chmod 775 /etc/passwd
-# RUN sed -i "s#/sbin/nologin#/bin/bash#g" /etc/passwd
 RUN useradd -D -s /usr/bin/bash
-RUN groupadd -g 1000730000 openshift; useradd -m -d /opt/code-base -s /usr/bin/bash -u 1000730000 -g root openshift
-# RUN mkdir -p /home/openshift; chown -R openshift:root /home-openshift; chmod -R 775 /home/openshift
-# RUN touch /.gitconfig; chown -R 1000730000:root /.gitconfig; chmod -R 775 /.gitconfig
-# RUN mkdir -p /.vscode-server; chown -R 1000730000:root /.vscode-server; chmod -R 775 /.vscode-server
+RUN groupadd -g ${OPENSHIFT_UID} openshift; useradd -m -d ${OPENSHIFT_HOME} -s /usr/bin/bash -u ${OPENSHIFT_UID} -g root openshift
 
-VOLUME /opt/code-base
+VOLUME ${OPENSHIFT_HOME}
 
 USER openshift
-WORKDIR /opt/code-base
+WORKDIR ${OPENSHIFT_HOME}
 
 CMD sh /.init/entrypoint.sh
