@@ -16,7 +16,7 @@ RUN chown -R 1000740000:root /.vscode-server
 RUN chmod -R 775 /.vscode-server
 
 WORKDIR /opt/code-base
-RUN chown -R 1000740000:root .
-RUN chmod -R 775 .
+RUN chown -R 1000740000:root /opt/code-base
+RUN chmod -R 775 /opt/code-base
 
 CMD sh /.init/entrypoint.sh
