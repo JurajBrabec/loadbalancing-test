@@ -1,5 +1,7 @@
 FROM node:20
-ARG OPENSHIFT_HOME=/opt/code-base
+
+ARG PERSISTENT_VOLUME=/opt/code-base
+ARG OPENSHIFT_HOME=${PERSISTENT_VOLUME}/home
 ARG OPENSHIFT_UID=1000730000
 
 USER root
@@ -18,7 +20,7 @@ RUN chmod 775 /etc/passwd
 RUN useradd -D -s /usr/bin/bash
 RUN groupadd -g ${OPENSHIFT_UID} openshift; useradd -m -d ${OPENSHIFT_HOME} -s /usr/bin/bash -u ${OPENSHIFT_UID} -g root openshift
 
-VOLUME ${OPENSHIFT_HOME}
+VOLUME ${PERSISTENT_VOLUME}
 
 USER openshift
 WORKDIR ${OPENSHIFT_HOME}
