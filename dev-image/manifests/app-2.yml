@@ -40,7 +40,7 @@ spec:
           volumeMounts:
             - name: code-base
               mountPath: /opt/code-base
-              subPath: loadbalancing-test
+              subPath: lbt1
       volumes:
         - name: code-base
           persistentVolumeClaim:

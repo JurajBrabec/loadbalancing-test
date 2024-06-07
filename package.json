@@ -1,11 +1,11 @@
 {
-  "name": "servicemesh-test",
+  "name": "loadbalancing-test",
   "version": "1.0.0",
   "description": "",
   "main": "app-1.js",
   "scripts": {
     "dev:app-1": "nodemon --inspect -L app-1.js",
-    "dev:app-2": "nodemon app-2.js"
+    "dev:app-2": "nodemon --inspect -L app-2.js"
   },
   "keywords": [],
   "author": "",
