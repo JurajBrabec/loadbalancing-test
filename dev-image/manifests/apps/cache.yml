@@ -1,0 +1,53 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.openshift.io/connects-to: 'core'
+    app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4'
+  labels:
+    app: cache
+    app.kubernetes.io/part-of: excalibur-v4-dev
+  name: cache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cache
+      app.kubernetes.io/part-of: excalibur-v4-dev
+      deployment: cache
+  template:
+    metadata:
+      labels:
+        app: cache
+        app.kubernetes.io/part-of: excalibur-v4-dev
+        deployment: cache
+    spec:
+      containers:
+        - image: redis:7.2.0-alpine
+          name: cache
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+          resources:
+            limits:
+              cpu: '1'
+              memory: '512Mi'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: cache
+    app.kubernetes.io/part-of: excalibur-v4-dev
+  name: cache
+spec:
+  ports:
+    - name: tcp-6379
+      protocol: TCP
+      port: 6379
+      targetPort: 6379
+  selector:
+    app: cache
+    app.kubernetes.io/part-of: excalibur-v4-dev
+    deployment: cache

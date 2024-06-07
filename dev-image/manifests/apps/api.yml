@@ -85,7 +85,7 @@ metadata:
   name: api-http
 spec:
   ports:
-    - name: tcp8000
+    - name: tcp-8000
       protocol: TCP
       port: 8000
       targetPort: 8000
@@ -100,7 +100,7 @@ metadata:
   labels:
     app: api
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: api-rpc
+  name: api
 spec:
   ports:
     - name: tcp-8080
