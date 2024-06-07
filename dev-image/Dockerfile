@@ -12,12 +12,14 @@ ADD . /.init
 RUN chown -R root:root /.init; chmod -R 755 /.init
 RUN touch /.gitconfig; chown -R 1000730000:root /.gitconfig; chmod -R 775 /.gitconfig
 RUN mkdir -p /.vscode-server; chown -R 1000730000:root /.vscode-server; chmod -R 775 /.vscode-server
-#RUN sed -i "s#/sbin/nologin#$new_shell#g" /etc/passwd
+RUN useradd -D -s /bin/bash
+RUN useradd -m -d / -s /bin/bash -u 1000730000 -g root openshift
+RUN sed -i "s#/sbin/nologin#/bin/bash#g" /etc/passwd
 RUN chmod 775 /etc/passwd
 
 VOLUME /opt/code-base
 
-USER node
+USER openshift
 WORKDIR /opt/code-base
 
 CMD sh /.init/entrypoint.sh
