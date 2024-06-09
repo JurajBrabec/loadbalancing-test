@@ -45,7 +45,7 @@ spec:
           name: dev-image
           resources:
             requests:
-              cpu: 500m
+              cpu: 100m
               memory: 512Mi
             limits:
               cpu: 1
@@ -53,13 +53,6 @@ spec:
           volumeMounts:
             - name: code-base
               mountPath: /opt/code-base
-      # securityContext:
-      #   allowPrivilegeEscalation: false
-      #   capabilities:
-      #     drop:
-      #       - ALL
-      #   runAsUser: 1000000000
-      #   fsGroup: 1000000000
       volumes:
         - name: code-base
           persistentVolumeClaim:

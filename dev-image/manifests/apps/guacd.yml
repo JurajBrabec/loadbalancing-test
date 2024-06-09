@@ -6,34 +6,28 @@ metadata:
     app.openshift.io/connects-to: '[]'
     app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
   labels:
-    app: database
+    app: guacd
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: database
+  name: guacd
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: database
+      app: guacd
       app.kubernetes.io/part-of: excalibur-v4-dev
-      deployment: database
+      deployment: guacd
   template:
     metadata:
       labels:
-        app: database
+        app: guacd
         app.kubernetes.io/part-of: excalibur-v4-dev
-        deployment: database
+        deployment: guacd
     spec:
       containers:
-        - env:
-            - name: MYSQL_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: database-root
-                  key: password
-          image: mariadb:11.0
-          name: database
+        - image: guacamole/guacd:1.5.2
+          name: guacd
           ports:
-            - containerPort: 3306
+            - containerPort: 4822
               protocol: TCP
           resources:
             requests:
@@ -41,36 +35,30 @@ spec:
               memory: 64Mi
             limits:
               cpu: 1
-              memory: 1Gi
+              memory: 512Mi
           volumeMounts:
             - name: code-base
-              mountPath: /docker-entrypoint-initdb.d
-              subPath: excalibur-v4/services/database/sql
-            - name: code-base
-              mountPath: /var/lib/mysql
-              subPath: volumes/database
+              mountPath: /var/excalibur/pam-recordings
+              subPath: volumes/pam-recordings
       volumes:
         - name: code-base
           persistentVolumeClaim:
             claimName: code-base
-        - name: environment-variables
-          configMap:
-            name: environment-variables
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: database
+    app: guacd
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: database
+  name: guacd
 spec:
   ports:
-    - name: tcp-3306
+    - name: tcp-4822
       protocol: TCP
-      port: 3306
-      targetPort: 3306
+      port: 4822
+      targetPort: 4822
   selector:
-    app: database
+    app: guacd
     app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: database
+    deployment: guacd

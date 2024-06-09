@@ -30,9 +30,6 @@ spec:
               '-c',
               'cd /opt/excalibur/repository && npm i && npm run prebuild && npm run dev',
             ]
-          #          envFrom:
-          #            - configMapRef:
-          #                name: environment-variables
           env:
             - name: DEV_MODE
               value: 'true'
@@ -63,11 +60,11 @@ spec:
               protocol: TCP
           resources:
             requests:
-              cpu: 500m
+              cpu: 10m
               memory: 64Mi
             limits:
               cpu: 1
-              memory: 2Gi
+              memory: 1Gi
           volumeMounts:
             - name: code-base
               mountPath: /opt/excalibur/repository

@@ -6,34 +6,28 @@ metadata:
     app.openshift.io/connects-to: '[]'
     app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
   labels:
-    app: database
+    app: loki
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: database
+  name: loki
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: database
+      app: loki
       app.kubernetes.io/part-of: excalibur-v4-dev
-      deployment: database
+      deployment: loki
   template:
     metadata:
       labels:
-        app: database
+        app: loki
         app.kubernetes.io/part-of: excalibur-v4-dev
-        deployment: database
+        deployment: loki
     spec:
       containers:
-        - env:
-            - name: MYSQL_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: database-root
-                  key: password
-          image: mariadb:11.0
-          name: database
+        - image: grafana/loki:2.8.3
+          name: loki
           ports:
-            - containerPort: 3306
+            - containerPort: 8000
               protocol: TCP
           resources:
             requests:
@@ -41,36 +35,30 @@ spec:
               memory: 64Mi
             limits:
               cpu: 1
-              memory: 1Gi
+              memory: 512Mi
           volumeMounts:
             - name: code-base
-              mountPath: /docker-entrypoint-initdb.d
-              subPath: excalibur-v4/services/database/sql
-            - name: code-base
-              mountPath: /var/lib/mysql
-              subPath: volumes/database
+              mountPath: /loki
+              subPath: volumes/loki-data
       volumes:
         - name: code-base
           persistentVolumeClaim:
             claimName: code-base
-        - name: environment-variables
-          configMap:
-            name: environment-variables
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: database
+    app: loki
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: database
+  name: loki
 spec:
   ports:
-    - name: tcp-3306
+    - name: tcp-8000
       protocol: TCP
-      port: 3306
-      targetPort: 3306
+      port: 8000
+      targetPort: 8000
   selector:
-    app: database
+    app: loki
     app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: database
+    deployment: loki
