@@ -40,7 +40,13 @@ spec:
       #   - mountPath: /mnt/code-base
       #     name: code-base
       containers:
-        - image: ' '
+        - env:
+            - name: GITHUB_PAT
+              valueFrom:
+                secretKeyRef:
+                  name: github-pat
+                  key: token
+          image: ' '
           imagePullPolicy: Always
           name: dev-image
           resources:
