@@ -1,0 +1,101 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.openshift.io/connects-to: '[]'
+    app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
+  labels:
+    app: dashboard
+    app.kubernetes.io/part-of: excalibur-v4-dev
+  name: dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dashboard
+      app.kubernetes.io/part-of: excalibur-v4-dev
+      deployment: dashboard
+  template:
+    metadata:
+      labels:
+        app: dashboard
+        app.kubernetes.io/part-of: excalibur-v4-dev
+        deployment: dashboard
+    spec:
+      containers:
+        - command:
+            ['sh', '-c', 'cd /opt/excalibur/dashboard && npm i && npm start']
+          env:
+            - name: DEV_MODE
+              value: 'true'
+            - name: GITHUB_PAT
+              valueFrom:
+                secretKeyRef:
+                  name: github-pat
+                  key: token
+          image: registry.access.redhat.com/ubi8/nodejs-20
+          name: dashboard
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              cpu: 1
+              memory: 1Gi
+          volumeMounts:
+            - name: code-base
+              mountPath: /opt/excalibur/dashboard
+              subPath: excalibur-v4/services/dashboard
+            - name: environment-variables
+              mountPath: /opt/app-root/src/.npmrc
+              subPath: .npmrc
+            - name: code-base
+              mountPath: /usr/share/nginx/html
+              subPath: volumes/dashboard-static-files
+      volumes:
+        - name: code-base
+          persistentVolumeClaim:
+            claimName: code-base
+        - name: environment-variables
+          configMap:
+            name: environment-variables
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: dashboard
+    app.kubernetes.io/part-of: excalibur-v4-dev
+  name: dashboard-debugger
+spec:
+  ports:
+    - name: tcp-5858
+      protocol: TCP
+      port: 5858
+      targetPort: 5858
+  selector:
+    app: dashboard
+    app.kubernetes.io/part-of: excalibur-v4-dev
+    deployment: dashboard
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: dashboard
+    app.kubernetes.io/part-of: excalibur-v4-dev
+  name: dashboard
+spec:
+  ports:
+    - name: tcp-3000
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+  selector:
+    app: dashboard
+    app.kubernetes.io/part-of: excalibur-v4-dev
+    deployment: dashboard

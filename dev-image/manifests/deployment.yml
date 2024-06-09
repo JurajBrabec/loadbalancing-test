@@ -53,10 +53,16 @@ spec:
           volumeMounts:
             - name: code-base
               mountPath: /opt/code-base
+            - name: environment-variables
+              mountPath: /opt/code-base/home/.npmrc
+              subPath: .npmrc
       volumes:
         - name: code-base
           persistentVolumeClaim:
             claimName: code-base
+        - name: environment-variables
+          configMap:
+            name: environment-variables
   triggers:
     - type: ImageChange
       imageChangeParams:
