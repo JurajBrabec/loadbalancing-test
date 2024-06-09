@@ -44,9 +44,12 @@ spec:
           imagePullPolicy: Always
           name: dev-image
           resources:
-            limits:
+            requests:
               cpu: 500m
-              memory: 1Gi
+              memory: 512Mi
+            limits:
+              cpu: 1
+              memory: 2Gi
           volumeMounts:
             - name: code-base
               mountPath: /opt/code-base

@@ -1,0 +1,79 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.openshift.io/connects-to: '[]'
+    app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
+  labels:
+    app: database
+    app.kubernetes.io/part-of: excalibur-v4-dev
+  name: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database
+      app.kubernetes.io/part-of: excalibur-v4-dev
+      deployment: database
+  template:
+    metadata:
+      labels:
+        app: database
+        app.kubernetes.io/part-of: excalibur-v4-dev
+        deployment: database
+    spec:
+      containers:
+        #          envFrom:
+        #            - configMapRef:
+        #                name: environment-variables
+        - env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: database-root
+                  key: password
+          image: mariadb:11.0
+          name: database
+          ports:
+            - containerPort: 3306
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 500m
+              memory: 64Mi
+            limits:
+              cpu: 1
+              memory: 2Gi
+          volumeMounts:
+            - name: code-base
+              mountPath: /docker-entrypoint-initdb.d
+              subPath: excalibur-v4/services/database/sql
+            - name: code-base
+              mountPath: /var/lib/mysql
+              subPath: volumes/database
+      volumes:
+        - name: code-base
+          persistentVolumeClaim:
+            claimName: code-base
+        - name: environment-variables
+          configMap:
+            name: environment-variables
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: database
+    app.kubernetes.io/part-of: excalibur-v4-dev
+  name: database
+spec:
+  ports:
+    - name: tcp-3306
+      protocol: TCP
+      port: 3306
+      targetPort: 3306
+  selector:
+    app: database
+    app.kubernetes.io/part-of: excalibur-v4-dev
+    deployment: database

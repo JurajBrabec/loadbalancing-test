@@ -4,8 +4,17 @@ metadata:
   labels:
     app: dev-image
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: npmrc-config
+  name: environment-variables
 data:
   .npmrc: |
     //npm.pkg.github.com/:_authToken=${GITHUB_PAT}
     @excalibur-enterprise:registry=https://npm.pkg.github.com
+  # Variables from deploy/.env
+  DOCKER_REGISTRY: ghcr.io/
+  DOCKER_USERNAME: excalibur-enterprise
+  # GITHUB_PAT stored in Secret github-pat
+  EXC_ADMIN_USER: admin
+  EXC_ADMIN_PASSWORD: admin
+  EXC_ADMIN_EMAIL: jdoe@xclbr.com
+  EXC_SERVER_HOSTNAME: dev.xclbr.local
+  # EXC_DB_ROOT_PASSWORD stored in Secret database-root

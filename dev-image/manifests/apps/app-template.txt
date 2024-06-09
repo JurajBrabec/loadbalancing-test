@@ -25,7 +25,10 @@ spec:
     spec:
       containers:
         - command:
-            ['sh', '-c', 'cd /opt/excalibur/{APP_FOLDER} && npm install && npm run dev']
+            ['sh', '-c', 'cd /opt/excalibur/{APP_FOLDER} && npm i && npm run prebuild && npm run dev']
+          envFrom:
+            - configMapRef:
+                name: environment-variables
           env:
             - name: DEV_MODE
               value: 'true'
@@ -39,8 +42,6 @@ spec:
           ports:
             - containerPort: {APP_PORT}
               protocol: TCP
-            - containerPort: {APP_PORT}
-              protocol: TCP
           resources:
             requests:
               cpu: {APP_CPU_MIN}
@@ -52,16 +53,16 @@ spec:
             - name: code-base
               mountPath: /opt/excalibur/{APP_FOLDER}
               subPath: excalibur-v4/services/{APP_FOLDER}
-            - name: npmrc-config
+            - name: environment-variables
               mountPath: /opt/app-root/src/.npmrc
               subPath: .npmrc
       volumes:
         - name: code-base
           persistentVolumeClaim:
             claimName: code-base
-        - name: npmrc-config
+        - name: environment-variables
           configMap:
-            name: npmrc-config
+            name: environment-variables
 ---
 apiVersion: v1
 kind: Service
