@@ -5,8 +5,6 @@ if [[ ! -d ${HOME} ]]; then
     echo "Creating home"
     mkdir -p ${HOME}
 fi
-# Copy .npmrc file to home folder
-cp /.init/.npmrc ${HOME}
 
 # Add group write permissions to persistent volume folders to be able to delete old files when Openshift user ID changes again
 echo "Reseting permissions for home"
