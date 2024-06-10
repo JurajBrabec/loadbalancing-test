@@ -4,8 +4,10 @@ echo "DEV Image"
 # Add group write permissions to $HOME folder to be able to delete old files when Openshift user ID changes again
 echo "Reseting permissions for ${HOME}"
 
-chown -R openshift:root ${HOME} >/dev/null 2>&1
-chmod -R g+w ${HOME} >/dev/null 2>&1
+chown -R openshift:root ${HOME} # >/dev/null 2>&1
+chmod -R g+w ${HOME} # >/dev/null 2>&1
+chmod -R g+w ${HOME}/../excalibur-v4 # >/dev/null 2>&1
+chmod -R g+w ${HOME}/../volumes # >/dev/null 2>&1
 
 echo "Starting daemon $(date)"
 

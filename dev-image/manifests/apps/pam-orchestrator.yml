@@ -1,0 +1,108 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.openshift.io/connects-to: '["cache","loki"]'
+    app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
+  labels:
+    app: pam-orchestrator
+    app.kubernetes.io/part-of: excalibur-v4-dev
+  name: pam-orchestrator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pam-orchestrator
+      app.kubernetes.io/part-of: excalibur-v4-dev
+      deployment: pam-orchestrator
+  template:
+    metadata:
+      labels:
+        app: pam-orchestrator
+        app.kubernetes.io/part-of: excalibur-v4-dev
+        deployment: pam-orchestrator
+    spec:
+      containers:
+        - command:
+            [
+              'sh',
+              '-c',
+              'cd /opt/excalibur/pam-orchestrator && npm i && npm run prebuild && npm run dev',
+            ]
+          env:
+            - name: DEV_MODE
+              value: 'true'
+            - name: GITHUB_PAT
+              valueFrom:
+                secretKeyRef:
+                  name: github-pat
+                  key: token
+            - name: EXC_PAM_ORCHESTRATOR_LOG_CONSOLE_ENABLED
+              value: 'true'
+            - name: EXC_PAM_ORCHESTRATOR_LOG_CONSOLE_LEVEL
+              value: debug
+            - name: EXC_PAM_ORCHESTRATOR_LOG_LOKI_ENABLED
+              value: 'false'
+          image: registry.access.redhat.com/ubi8/nodejs-20
+          name: pam-orchestrator
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              cpu: 1
+              memory: 512Mi
+          volumeMounts:
+            - name: code-base
+              mountPath: /opt/excalibur/pam-orchestrator
+              subPath: excalibur-v4/services/pam-orchestrator
+            - name: environment-variables
+              mountPath: /opt/app-root/src/.npmrc
+              subPath: .npmrc
+      volumes:
+        - name: code-base
+          persistentVolumeClaim:
+            claimName: code-base
+        - name: environment-variables
+          configMap:
+            name: environment-variables
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: pam-orchestrator
+    app.kubernetes.io/part-of: excalibur-v4-dev
+  name: pam-orchestrator-debugger
+spec:
+  ports:
+    - name: tcp-5858
+      protocol: TCP
+      port: 5858
+      targetPort: 5858
+  selector:
+    app: pam-orchestrator
+    app.kubernetes.io/part-of: excalibur-v4-dev
+    deployment: pam-orchestrator
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: pam-orchestrator
+    app.kubernetes.io/part-of: excalibur-v4-dev
+  name: pam-orchestrator
+spec:
+  ports:
+    - name: tcp-8000
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+  selector:
+    app: pam-orchestrator
+    app.kubernetes.io/part-of: excalibur-v4-dev
+    deployment: pam-orchestrator
