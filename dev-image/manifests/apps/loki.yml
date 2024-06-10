@@ -27,7 +27,7 @@ spec:
         - image: grafana/loki:2.8.3
           name: loki
           ports:
-            - containerPort: 8000
+            - containerPort: 3100
               protocol: TCP
           resources:
             requests:
@@ -54,10 +54,10 @@ metadata:
   name: loki
 spec:
   ports:
-    - name: tcp-8000
+    - name: tcp-3100
       protocol: TCP
-      port: 8000
-      targetPort: 8000
+      port: 3100
+      targetPort: 3100
   selector:
     app: loki
     app.kubernetes.io/part-of: excalibur-v4-dev

@@ -26,9 +26,6 @@ spec:
       containers:
         - command:
             ['sh', '-c', 'cd /opt/excalibur/pam-client && npm i && npm start']
-          envFrom:
-            - configMapRef:
-                name: environment-variables
           env:
             - name: DEV_MODE
               value: 'true'
