@@ -3,32 +3,32 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    app.openshift.io/connects-to: '["loki"]'
+    app.openshift.io/connects-to: '["core","repository","loki"]'
     app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
   labels:
-    app: mailer
+    app: token
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: mailer
+  name: token
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mailer
+      app: token
       app.kubernetes.io/part-of: excalibur-v4-dev
-      deployment: mailer
+      deployment: token
   template:
     metadata:
       labels:
-        app: mailer
+        app: token
         app.kubernetes.io/part-of: excalibur-v4-dev
-        deployment: mailer
+        deployment: token
     spec:
       containers:
         - command:
             [
               'sh',
               '-c',
-              'cd /opt/excalibur/mailer && npm i && npm run prebuild && npm run dev',
+              'cd /opt/excalibur/token && npm i && npm run prebuild && npm run dev',
             ]
           env:
             - name: DEV_MODE
@@ -38,15 +38,17 @@ spec:
                 secretKeyRef:
                   name: github-pat
                   key: token
-            - name: EXC_MAIL_LOG_CONSOLE_ENABLED
+            - name: EXC_TOKEN_LOG_CONSOLE_ENABLED
               value: 'true'
-            - name: EXC_MAIL_LOG_CONSOLE_LEVEL
+            - name: EXC_TOKEN_LOG_CONSOLE_LEVEL
               value: debug
-            - name: EXC_MAIL_LOG_LOKI_ENABLED
+            - name: EXC_TOKEN_LOG_LOKI_ENABLED
               value: 'false'
           image: registry.access.redhat.com/ubi8/nodejs-20
-          name: mailer
+          name: token
           ports:
+            - containerPort: 8000
+              protocol: TCP
             - containerPort: 8080
               protocol: TCP
           resources:
@@ -58,8 +60,8 @@ spec:
               memory: 512Mi
           volumeMounts:
             - name: code-base
-              mountPath: /opt/excalibur/mailer
-              subPath: excalibur-v4/services/mailer
+              mountPath: /opt/excalibur/token
+              subPath: excalibur-v4/services/token
             - name: environment-variables
               mountPath: /opt/app-root/src/.npmrc
               subPath: .npmrc
@@ -75,9 +77,9 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: mailer
+    app: token
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: mailer-debugger
+  name: token-debugger
 spec:
   ports:
     - name: tcp-5858
@@ -85,17 +87,35 @@ spec:
       port: 5858
       targetPort: 5858
   selector:
-    app: mailer
+    app: token
     app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: mailer
+    deployment: token
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: mailer
+    app: token
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: mailer
+  name: token-ws
+spec:
+  ports:
+    - name: tcp-8000
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+  selector:
+    app: token
+    app.kubernetes.io/part-of: excalibur-v4-dev
+    deployment: token
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: token
+    app.kubernetes.io/part-of: excalibur-v4-dev
+  name: token
 spec:
   ports:
     - name: tcp-8080
@@ -103,6 +123,6 @@ spec:
       port: 8080
       targetPort: 8080
   selector:
-    app: mailer
+    app: token
     app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: mailer
+    deployment: token
