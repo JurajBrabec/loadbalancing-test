@@ -4,6 +4,8 @@ echo "DEV Image entrypoint"
 if [[ ! -d ${HOME} ]]; then
     echo "Creating home"
     mkdir -p ${HOME}
+    # copy .bashrc/.profile from NODE user home folder
+    cp /home/node/.* ${HOME}
 fi
 
 # Add group write permissions to persistent volume folders to be able to delete old files when Openshift user ID changes again
