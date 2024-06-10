@@ -3,37 +3,43 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    app.openshift.io/connects-to: '[]'
+    app.openshift.io/connects-to: '["guacd","loki","repository"]'
     app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
   labels:
-    app: dashboard
+    app: pam
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: dashboard
+  name: pam
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dashboard
+      app: pam
       app.kubernetes.io/part-of: excalibur-v4-dev
-      deployment: dashboard
+      deployment: pam
   template:
     metadata:
       labels:
-        app: dashboard
+        app: pam
         app.kubernetes.io/part-of: excalibur-v4-dev
-        deployment: dashboard
+        deployment: pam
     spec:
       containers:
-        - command: ['sh', '-c', 'cd /opt/excalibur/dashboard; npm start']
+        - command: ['sh', '-c', 'cd /opt/excalibur/pam; npm run dev']
           env:
             - name: DEV_MODE
               value: 'true'
+            - name: EXC_PAM_LOG_CONSOLE_ENABLED
+              value: 'true'
+            - name: EXC_PAM_LOG_CONSOLE_LEVEL
+              value: debug
           image: registry.access.redhat.com/ubi8/nodejs-20
-          name: dashboard
+          name: pam
           ports:
             - containerPort: 5858
               protocol: TCP
-            - containerPort: 3000
+            - containerPort: 8000
+              protocol: TCP
+            - containerPort: 8080
               protocol: TCP
           resources:
             requests:
@@ -41,14 +47,14 @@ spec:
               memory: 64Mi
             limits:
               cpu: 1
-              memory: 3Gi
+              memory: 512Mi
           volumeMounts:
             - name: code-base
-              mountPath: /opt/excalibur/dashboard
-              subPath: excalibur-v4/services/dashboard
+              mountPath: /opt/excalibur/pam
+              subPath: excalibur-v4/services/pam
             - name: code-base
-              mountPath: /usr/share/nginx/html
-              subPath: volumes/dashboard-static-files
+              mountPath: /var/excalibur/pam/recordings
+              subPath: volumes/pam-recordings
       volumes:
         - name: code-base
           persistentVolumeClaim:
@@ -58,20 +64,24 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: dashboard
+    app: pam
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: dashboard-debugger
+  name: pam
 spec:
   ports:
     - name: tcp-inspector
       protocol: TCP
       port: 5858
       targetPort: 5858
-    - name: tcp-3000
+    - name: tcp-8000
       protocol: TCP
-      port: 3000
-      targetPort: 3000
+      port: 8000
+      targetPort: 8000
+    - name: tcp-8080
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
   selector:
-    app: dashboard
+    app: pam
     app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: dashboard
+    deployment: pam
