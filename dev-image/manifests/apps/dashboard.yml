@@ -24,7 +24,7 @@ spec:
         deployment: dashboard
     spec:
       containers:
-        - command: ['sh', '-c', 'cd /opt/excalibur/dashboard && npm start']
+        - command: ['sh', '-c', 'cd /opt/excalibur/dashboard; npm start']
           env:
             - name: DEV_MODE
               value: 'true'

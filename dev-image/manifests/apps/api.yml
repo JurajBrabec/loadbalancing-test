@@ -24,12 +24,7 @@ spec:
         deployment: api
     spec:
       containers:
-        - command:
-            [
-              'sh',
-              '-c',
-              'cd /opt/excalibur/api && npm run prebuild && npm run dev',
-            ]
+        - command: ['sh', '-c', 'cd /opt/excalibur/api; npm run dev']
           env:
             - name: EXC_API_LOG_CONSOLE_ENABLED
               value: 'true'

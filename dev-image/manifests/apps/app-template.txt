@@ -25,18 +25,10 @@ spec:
     spec:
       containers:
         - command:
-            ['sh', '-c', 'cd /opt/excalibur/{APP_FOLDER} && npm run prebuild && npm run dev']
-#          envFrom:
-#            - configMapRef:
-#                name: environment-variables
+            ['sh', '-c', 'cd /opt/excalibur/{APP_FOLDER}; npm run dev']
           env:
             - name: DEV_MODE
               value: 'true'
-#            - name: GITHUB_PAT
-#              valueFrom:
-#                secretKeyRef:
-#                  name: github-pat
-#                  key: token
           image: registry.access.redhat.com/ubi8/nodejs-20
           name: {APP_NAME}
           ports:

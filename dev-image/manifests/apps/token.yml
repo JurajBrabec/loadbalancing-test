@@ -24,12 +24,7 @@ spec:
         deployment: token
     spec:
       containers:
-        - command:
-            [
-              'sh',
-              '-c',
-              'cd /opt/excalibur/token && npm run prebuild && npm run dev',
-            ]
+        - command: ['sh', '-c', 'cd /opt/excalibur/token; npm run dev']
           env:
             - name: DEV_MODE
               value: 'true'

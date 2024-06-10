@@ -3,9 +3,9 @@ echo "DEV Image entrypoint"
 
 cp /home/node/.npmrc ${HOME}/.npmrc
 # Add group write permissions to persistent volume folders to be able to delete old files when Openshift user ID changes again
-echo "Reseting permissions for home folder"
-chown -R openshift:root ${HOME} # >/dev/null 2>&1
-chmod -R g+w ${HOME} # >/dev/null 2>&1
+#echo "Reseting permissions for home folder"
+#chown -R openshift:root ${HOME} # >/dev/null 2>&1
+#chmod -R g+w ${HOME} # >/dev/null 2>&1
 
 if [[ ! -d /opt/code-base/excalibur-v4 ]]; then
     echo "Creating repository"

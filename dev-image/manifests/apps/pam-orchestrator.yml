@@ -25,11 +25,7 @@ spec:
     spec:
       containers:
         - command:
-            [
-              'sh',
-              '-c',
-              'cd /opt/excalibur/pam-orchestrator && npm run prebuild && npm run dev',
-            ]
+            ['sh', '-c', 'cd /opt/excalibur/pam-orchestrator; npm run dev']
           env:
             - name: DEV_MODE
               value: 'true'

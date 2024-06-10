@@ -24,12 +24,7 @@ spec:
         deployment: client
     spec:
       containers:
-        - command:
-            [
-              'sh',
-              '-c',
-              'cd /opt/excalibur/client && npm i && npm run prebuild && npm run dev',
-            ]
+        - command: ['sh', '-c', 'cd /opt/excalibur/client; npm run dev']
           env:
             - name: DEV_MODE
               value: 'true'

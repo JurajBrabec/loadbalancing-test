@@ -24,12 +24,7 @@ spec:
         deployment: mailer
     spec:
       containers:
-        - command:
-            [
-              'sh',
-              '-c',
-              'cd /opt/excalibur/mailer && npm run prebuild && npm run dev',
-            ]
+        - command: ['sh', '-c', 'cd /opt/excalibur/mailer; npm run dev']
           env:
             - name: DEV_MODE
               value: 'true'

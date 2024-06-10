@@ -24,12 +24,7 @@ spec:
         deployment: repository
     spec:
       containers:
-        - command:
-            [
-              'sh',
-              '-c',
-              'cd /opt/excalibur/repository && npm run prebuild && npm run dev',
-            ]
+        - command: ['sh', '-c', 'cd /opt/excalibur/repository; npm run dev']
           env:
             - name: DEV_MODE
               value: 'true'
