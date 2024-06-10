@@ -1,6 +1,7 @@
 #!/bin/bash
 echo "DEV Image entrypoint"
 
+cp /home/node/.npmrc ${HOME}/.npmrc
 # Add group write permissions to persistent volume folders to be able to delete old files when Openshift user ID changes again
 echo "Reseting permissions for home folder"
 chown -R openshift:root ${HOME} # >/dev/null 2>&1

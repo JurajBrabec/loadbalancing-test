@@ -64,12 +64,12 @@ spec:
             runAsUser: 1000710000
             seccompProfile:
               type: 'RuntimeDefault'
-            supplementalGroups: [1000710000]
+            supplementalGroups: [0, 1000710000]
           volumeMounts:
             - name: code-base
               mountPath: /opt/code-base
             - name: npmrc
-              mountPath: /home/openshift/.npmrc
+              mountPath: /home/node/.npmrc
               subPath: .npmrc
       volumes:
         - name: code-base
