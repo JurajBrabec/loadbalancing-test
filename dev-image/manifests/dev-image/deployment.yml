@@ -60,6 +60,7 @@ spec:
             allowPrivilegeEscalation: false
             capabilities:
               drop: ['ALL']
+            fsGroup: root
             runAsNonRoot: true
             runAsUser: 1000710000
             seccompProfile:
@@ -69,7 +70,7 @@ spec:
             - name: code-base
               mountPath: /opt/code-base
             - name: npmrc
-              mountPath: /opt/code-base/home/.npmrc
+              mountPath: /home/openshift/.npmrc
               subPath: .npmrc
       volumes:
         - name: code-base
