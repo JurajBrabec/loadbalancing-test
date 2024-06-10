@@ -6,29 +6,29 @@ metadata:
     app.openshift.io/connects-to: '["core","repository","loki"]'
     app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
   labels:
-    app: token
+    app: client
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: token
+  name: client
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: token
+      app: client
       app.kubernetes.io/part-of: excalibur-v4-dev
-      deployment: token
+      deployment: client
   template:
     metadata:
       labels:
-        app: token
+        app: client
         app.kubernetes.io/part-of: excalibur-v4-dev
-        deployment: token
+        deployment: client
     spec:
       containers:
         - command:
             [
               'sh',
               '-c',
-              'cd /opt/excalibur/token && npm i && npm run prebuild && npm run dev',
+              'cd /opt/excalibur/client && npm i && npm run prebuild && npm run dev',
             ]
           env:
             - name: DEV_MODE
@@ -38,14 +38,14 @@ spec:
                 secretKeyRef:
                   name: github-pat
                   key: token
-            - name: EXC_TOKEN_LOG_CONSOLE_ENABLED
+            - name: EXC_CLIENT_LOG_CONSOLE_ENABLED
               value: 'true'
-            - name: EXC_TOKEN_LOG_CONSOLE_LEVEL
+            - name: EXC_CLIENT_LOG_CONSOLE_LEVEL
               value: debug
-            - name: EXC_TOKEN_LOG_LOKI_ENABLED
+            - name: EXC_CLIENT_LOG_LOKI_ENABLED
               value: 'false'
           image: registry.access.redhat.com/ubi8/nodejs-20
-          name: token
+          name: client
           ports:
             - containerPort: 8000
               protocol: TCP
@@ -60,8 +60,8 @@ spec:
               memory: 512Mi
           volumeMounts:
             - name: code-base
-              mountPath: /opt/excalibur/token
-              subPath: excalibur-v4/services/token
+              mountPath: /opt/excalibur/client
+              subPath: excalibur-v4/services/client
             - name: environment-variables
               mountPath: /opt/app-root/src/.npmrc
               subPath: .npmrc
@@ -77,9 +77,9 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: token
+    app: client
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: token-debugger
+  name: client-debugger
 spec:
   ports:
     - name: tcp-5858
@@ -87,17 +87,17 @@ spec:
       port: 5858
       targetPort: 5858
   selector:
-    app: token
+    app: client
     app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: token
+    deployment: client
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: token
+    app: client
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: token
+  name: client
 spec:
   ports:
     - name: tcp-8000
@@ -105,17 +105,17 @@ spec:
       port: 8000
       targetPort: 8000
   selector:
-    app: token
+    app: client
     app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: token
+    deployment: client
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: token
+    app: client
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: token-rpc
+  name: client-rpc
 spec:
   ports:
     - name: tcp-8080
@@ -123,6 +123,6 @@ spec:
       port: 8080
       targetPort: 8080
   selector:
-    app: token
+    app: client
     app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: token
+    deployment: client
