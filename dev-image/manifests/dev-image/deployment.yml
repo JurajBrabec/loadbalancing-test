@@ -61,10 +61,10 @@ spec:
             capabilities:
               drop: ['ALL']
             runAsNonRoot: true
-            runAsUser: 1000710001
+            runAsUser: 1000710000
             seccompProfile:
               type: 'RuntimeDefault'
-            supplementalGroups: [1000710001]
+            supplementalGroups: [1000710000]
           volumeMounts:
             - name: code-base
               mountPath: /opt/code-base
