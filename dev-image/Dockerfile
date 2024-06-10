@@ -1,7 +1,7 @@
 FROM node:20
 
 ARG PERSISTENT_VOLUME=/opt/code-base
-ARG OPENSHIFT_HOME=${PERSISTENT_VOLUME}/homefolder
+ARG OPENSHIFT_HOME=${PERSISTENT_VOLUME}/home
 ARG OPENSHIFT_UID=1000710000
 ARG GITHUB_PAT=ghp_*
 
@@ -23,7 +23,6 @@ RUN chmod g+w /etc/passwd
 #RUN useradd -D -s /usr/bin/bash
 RUN mkdir -p ${OPENSHIFT_HOME}; chown -R openshift:root ${OPENSHIFT_HOME}; chmod -R g+w ${OPENSHIFT_HOME}; cp /home/node/.* ${OPENSHIFT_HOME}/
 RUN groupadd -g ${OPENSHIFT_UID} openshift; useradd -m -d ${OPENSHIFT_HOME} -s /usr/bin/bash -u ${OPENSHIFT_UID} -g root openshift
-RUN rm -rf /opt/code-base/home
 
 VOLUME ${PERSISTENT_VOLUME}
 
