@@ -23,7 +23,7 @@ RUN chmod g+w /etc/passwd
 #RUN useradd -D -s /usr/bin/bash
 #RUN mkdir -p ${OPENSHIFT_HOME};
 RUN groupadd -g ${OPENSHIFT_UID} openshift; useradd -m -d ${OPENSHIFT_HOME} -s /usr/bin/bash -u ${OPENSHIFT_UID} -g root openshift
-RUN chown -R openshift:root ${OPENSHIFT_HOME}; chmod -R g+w ${OPENSHIFT_HOME}; cp -r /home/node/{.bashrc,.profile} ${OPENSHIFT_HOME}/
+RUN chown -R openshift:root ${OPENSHIFT_HOME}; chmod -R g+w ${OPENSHIFT_HOME}; cp -r /home/node/.bashrc /home/node/.profile ${OPENSHIFT_HOME}/
 
 VOLUME ${PERSISTENT_VOLUME}
 
