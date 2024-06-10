@@ -68,7 +68,7 @@ spec:
             claimName: code-base
         - name: npmrc
           configMap:
-            name: .npmrc
+            name: npmrc
   triggers:
     - type: ImageChange
       imageChangeParams:

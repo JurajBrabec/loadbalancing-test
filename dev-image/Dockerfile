@@ -28,4 +28,4 @@ VOLUME ${PERSISTENT_VOLUME}
 USER openshift
 WORKDIR ${OPENSHIFT_HOME}
 
-CMD sh /.init/entrypoint.sh
+CMD bash /.init/entrypoint.sh
