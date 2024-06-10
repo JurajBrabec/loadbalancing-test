@@ -25,21 +25,23 @@ spec:
     spec:
       containers:
         - command:
-            ['sh', '-c', 'cd /opt/excalibur/{APP_FOLDER} && npm i && npm run prebuild && npm run dev']
-          envFrom:
-            - configMapRef:
-                name: environment-variables
+            ['sh', '-c', 'cd /opt/excalibur/{APP_FOLDER} && npm run prebuild && npm run dev']
+#          envFrom:
+#            - configMapRef:
+#                name: environment-variables
           env:
             - name: DEV_MODE
               value: 'true'
-            - name: GITHUB_PAT
-              valueFrom:
-                secretKeyRef:
-                  name: github-pat
-                  key: token
+#            - name: GITHUB_PAT
+#              valueFrom:
+#                secretKeyRef:
+#                  name: github-pat
+#                  key: token
           image: registry.access.redhat.com/ubi8/nodejs-20
           name: {APP_NAME}
           ports:
+            - containerPort: 5858
+              protocol: TCP
             - containerPort: {APP_PORT}
               protocol: TCP
           resources:
@@ -53,34 +55,10 @@ spec:
             - name: code-base
               mountPath: /opt/excalibur/{APP_FOLDER}
               subPath: excalibur-v4/services/{APP_FOLDER}
-            - name: environment-variables
-              mountPath: /opt/app-root/src/.npmrc
-              subPath: .npmrc
       volumes:
         - name: code-base
           persistentVolumeClaim:
             claimName: code-base
-        - name: environment-variables
-          configMap:
-            name: environment-variables
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: {APP_NAME}
-    app.kubernetes.io/part-of: excalibur-v4-dev
-  name: {APP_NAME}-debugger
-spec:
-  ports:
-    - name: tcp-5858
-      protocol: TCP
-      port: 5858
-      targetPort: 5858
-  selector:
-    app: {APP_NAME}
-    app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: {APP_NAME}
 ---
 apiVersion: v1
 kind: Service
@@ -91,6 +69,10 @@ metadata:
   name: {APP_NAME}
 spec:
   ports:
+    - name: tcp-inspector
+      protocol: TCP
+      port: 5858
+      targetPort: 5858
     - name: tcp-{APP_PORT}
       protocol: TCP
       port: {APP_PORT}

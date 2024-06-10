@@ -3,48 +3,50 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    app.openshift.io/connects-to: '["cache","core","database","hsm","identity-store","loki","mailer","pam","repository"]'
+    app.openshift.io/connects-to: '["ca","cache","hsm","identity-store","loki","mailer","pam","repository"]'
     app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
   labels:
-    app: api
+    app: core
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: api
+  name: core
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: api
+      app: core
       app.kubernetes.io/part-of: excalibur-v4-dev
-      deployment: api
+      deployment: core
   template:
     metadata:
       labels:
-        app: api
+        app: core
         app.kubernetes.io/part-of: excalibur-v4-dev
-        deployment: api
+        deployment: core
     spec:
       containers:
         - command:
             [
               'sh',
               '-c',
-              'cd /opt/excalibur/api && npm run prebuild && npm run dev',
+              'cd /opt/excalibur/core && npm run prebuild && npm run dev',
             ]
           env:
-            - name: EXC_API_LOG_CONSOLE_ENABLED
-              value: 'true'
-            - name: EXC_API_LOG_CONSOLE_LEVEL
-              value: 'debug'
-            - name: EXC_API_LOG_LOKI_ENABLED
-              value: 'false'
             - name: DEV_MODE
               value: 'true'
+            - name: EXC_CORE_LOG_CONSOLE_ENABLED
+              value: 'true'
+            - name: EXC_CORE_LOG_CONSOLE_LEVEL
+              value: debug
+            - name: EXC_CORE_LOKI_ENABLED
+              value: 'false'
+            - name: EXC_CORE_CA_URL
+              value: https://ca.xclbr.dev
+            - name: NODE_EXTRA_CA_CERTS
+              value: /usr/local/share/ca-certificates/ca.xclbr.dev.crt
           image: registry.access.redhat.com/ubi8/nodejs-20
-          name: api
+          name: core
           ports:
             - containerPort: 5858
-              protocol: TCP
-            - containerPort: 8000
               protocol: TCP
             - containerPort: 8080
               protocol: TCP
@@ -57,11 +59,11 @@ spec:
               memory: 1Gi
           volumeMounts:
             - name: code-base
-              mountPath: /opt/excalibur/api
-              subPath: excalibur-v4/services/api
+              mountPath: /opt/excalibur/core
+              subPath: excalibur-v4/services/core
             - name: code-base
-              mountPath: /var/excalibur/pam/recordings
-              subPath: volumes/pam-recordings
+              mountPath: /usr/local/share/ca-certificates/ca.xclbr.dev.crt
+              subPath: excalibur-v4/deploy/certificates/ca.xclbr.dev.crt
       volumes:
         - name: code-base
           persistentVolumeClaim:
@@ -71,24 +73,20 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: api
+    app: core
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: api
+  name: core
 spec:
   ports:
     - name: tcp-inspector
       protocol: TCP
       port: 5858
       targetPort: 5858
-    - name: tcp-8000
-      protocol: TCP
-      port: 8000
-      targetPort: 8000
     - name: tcp-8080
       protocol: TCP
       port: 8080
       targetPort: 8080
   selector:
-    app: api
+    app: core
     app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: api
+    deployment: core

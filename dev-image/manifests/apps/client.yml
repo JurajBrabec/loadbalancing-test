@@ -33,11 +33,6 @@ spec:
           env:
             - name: DEV_MODE
               value: 'true'
-            - name: GITHUB_PAT
-              valueFrom:
-                secretKeyRef:
-                  name: github-pat
-                  key: token
             - name: EXC_CLIENT_LOG_CONSOLE_ENABLED
               value: 'true'
             - name: EXC_CLIENT_LOG_CONSOLE_LEVEL
@@ -47,6 +42,8 @@ spec:
           image: registry.access.redhat.com/ubi8/nodejs-20
           name: client
           ports:
+            - containerPort: 5858
+              protocol: TCP
             - containerPort: 8000
               protocol: TCP
             - containerPort: 8080
@@ -62,34 +59,10 @@ spec:
             - name: code-base
               mountPath: /opt/excalibur/client
               subPath: excalibur-v4/services/client
-            - name: environment-variables
-              mountPath: /opt/app-root/src/.npmrc
-              subPath: .npmrc
       volumes:
         - name: code-base
           persistentVolumeClaim:
             claimName: code-base
-        - name: environment-variables
-          configMap:
-            name: environment-variables
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: client
-    app.kubernetes.io/part-of: excalibur-v4-dev
-  name: client-debugger
-spec:
-  ports:
-    - name: tcp-5858
-      protocol: TCP
-      port: 5858
-      targetPort: 5858
-  selector:
-    app: client
-    app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: client
 ---
 apiVersion: v1
 kind: Service
@@ -100,24 +73,14 @@ metadata:
   name: client
 spec:
   ports:
+    - name: tcp-inspector
+      protocol: TCP
+      port: 5858
+      targetPort: 5858
     - name: tcp-8000
       protocol: TCP
       port: 8000
       targetPort: 8000
-  selector:
-    app: client
-    app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: client
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: client
-    app.kubernetes.io/part-of: excalibur-v4-dev
-  name: client-rpc
-spec:
-  ports:
     - name: tcp-8080
       protocol: TCP
       port: 8080

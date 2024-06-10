@@ -28,16 +28,11 @@ spec:
             [
               'sh',
               '-c',
-              'cd /opt/excalibur/mailer && npm i && npm run prebuild && npm run dev',
+              'cd /opt/excalibur/mailer && npm run prebuild && npm run dev',
             ]
           env:
             - name: DEV_MODE
               value: 'true'
-            - name: GITHUB_PAT
-              valueFrom:
-                secretKeyRef:
-                  name: github-pat
-                  key: token
             - name: EXC_MAIL_LOG_CONSOLE_ENABLED
               value: 'true'
             - name: EXC_MAIL_LOG_CONSOLE_LEVEL
@@ -47,6 +42,8 @@ spec:
           image: registry.access.redhat.com/ubi8/nodejs-20
           name: mailer
           ports:
+            - containerPort: 5858
+              protocol: TCP
             - containerPort: 8080
               protocol: TCP
           resources:
@@ -60,34 +57,10 @@ spec:
             - name: code-base
               mountPath: /opt/excalibur/mailer
               subPath: excalibur-v4/services/mailer
-            - name: environment-variables
-              mountPath: /opt/app-root/src/.npmrc
-              subPath: .npmrc
       volumes:
         - name: code-base
           persistentVolumeClaim:
             claimName: code-base
-        - name: environment-variables
-          configMap:
-            name: environment-variables
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: mailer
-    app.kubernetes.io/part-of: excalibur-v4-dev
-  name: mailer-debugger
-spec:
-  ports:
-    - name: tcp-5858
-      protocol: TCP
-      port: 5858
-      targetPort: 5858
-  selector:
-    app: mailer
-    app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: mailer
 ---
 apiVersion: v1
 kind: Service
@@ -98,6 +71,10 @@ metadata:
   name: mailer
 spec:
   ports:
+    - name: tcp-inspector
+      protocol: TCP
+      port: 5858
+      targetPort: 5858
     - name: tcp-8080
       protocol: TCP
       port: 8080

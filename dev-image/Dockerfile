@@ -17,7 +17,7 @@ RUN apt-get update; \
     ; \
     apt-get clean
 
-ADD ./entrypoint.sh /.init/
+ADD . /.init/
 RUN chown -R root:root /.init; chmod -R 755 /.init
 RUN chmod g+w /etc/passwd
 RUN useradd -D -s /usr/bin/bash

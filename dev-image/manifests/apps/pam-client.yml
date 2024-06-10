@@ -24,19 +24,15 @@ spec:
         deployment: pam-client
     spec:
       containers:
-        - command:
-            ['sh', '-c', 'cd /opt/excalibur/pam-client && npm i && npm start']
+        - command: ['sh', '-c', 'cd /opt/excalibur/pam-client && npm start']
           env:
             - name: DEV_MODE
               value: 'true'
-            - name: GITHUB_PAT
-              valueFrom:
-                secretKeyRef:
-                  name: github-pat
-                  key: token
           image: registry.access.redhat.com/ubi8/nodejs-20
           name: pam-client
           ports:
+            - containerPort: 5858
+              protocol: TCP
             - containerPort: 3001
               protocol: TCP
           resources:
@@ -50,9 +46,6 @@ spec:
             - name: code-base
               mountPath: /opt/excalibur/pam-client
               subPath: excalibur-v4/services/pam-client
-            - name: environment-variables
-              mountPath: /opt/app-root/src/.npmrc
-              subPath: .npmrc
             - name: code-base
               mountPath: /usr/share/nginx/html
               subPath: volumes/pam-client-static-files
@@ -60,27 +53,6 @@ spec:
         - name: code-base
           persistentVolumeClaim:
             claimName: code-base
-        - name: environment-variables
-          configMap:
-            name: environment-variables
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: pam-client
-    app.kubernetes.io/part-of: excalibur-v4-dev
-  name: pam-client-debugger
-spec:
-  ports:
-    - name: tcp-5858
-      protocol: TCP
-      port: 5858
-      targetPort: 5858
-  selector:
-    app: pam-client
-    app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: pam-client
 ---
 apiVersion: v1
 kind: Service
@@ -91,6 +63,10 @@ metadata:
   name: pam-client
 spec:
   ports:
+    - name: tcp-inspector
+      protocol: TCP
+      port: 5858
+      targetPort: 5858
     - name: tcp-3001
       protocol: TCP
       port: 3001

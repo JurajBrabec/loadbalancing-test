@@ -28,16 +28,11 @@ spec:
             [
               'sh',
               '-c',
-              'cd /opt/excalibur/repository && npm i && npm run prebuild && npm run dev',
+              'cd /opt/excalibur/repository && npm run prebuild && npm run dev',
             ]
           env:
             - name: DEV_MODE
               value: 'true'
-            - name: GITHUB_PAT
-              valueFrom:
-                secretKeyRef:
-                  name: github-pat
-                  key: token
             - name: EXC_REPOSITORY_DB_HOST
               value: database
             - name: EXC_REPOSITORY_DB_USER
@@ -69,34 +64,10 @@ spec:
             - name: code-base
               mountPath: /opt/excalibur/repository
               subPath: excalibur-v4/services/repository
-            - name: environment-variables
-              mountPath: /opt/app-root/src/.npmrc
-              subPath: .npmrc
       volumes:
         - name: code-base
           persistentVolumeClaim:
             claimName: code-base
-        - name: environment-variables
-          configMap:
-            name: environment-variables
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: repository
-    app.kubernetes.io/part-of: excalibur-v4-dev
-  name: repository-debugger
-spec:
-  ports:
-    - name: tcp-5858
-      protocol: TCP
-      port: 5858
-      targetPort: 5858
-  selector:
-    app: repository
-    app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: repository
 ---
 apiVersion: v1
 kind: Service
@@ -107,6 +78,10 @@ metadata:
   name: repository
 spec:
   ports:
+    - name: tcp-inspector
+      protocol: TCP
+      port: 5858
+      targetPort: 5858
     - name: tcp-8080
       protocol: TCP
       port: 8080
