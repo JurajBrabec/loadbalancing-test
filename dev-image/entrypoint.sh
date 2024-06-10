@@ -12,6 +12,7 @@ if [[ ! -d /opt/code-base/excalibur-v4 ]]; then
     mkdir -p /opt/code-base/excalibur-v4
 fi
 echo "Reseting permissions for repository"
+chown -R openshift:root /opt/code-base/excalibur-v4 # >/dev/null 2>&1
 chmod -R g+w /opt/code-base/excalibur-v4 # >/dev/null 2>&1
 
 
@@ -20,6 +21,7 @@ if [[ ! -d /opt/code-base/volumes ]]; then
     mkdir -p /opt/code-base/volumes/{dashboard-static-files,database,grafana-data,loki-data,pam-client-static-files,pam-recordings}
 fi
 echo "Reseting permissions for volumes"
+chown -R openshift:root /opt/code-base/volumes # >/dev/null 2>&1
 chmod -R g+w /opt/code-base/volumes # >/dev/null 2>&1
 
 # Create daemon process
