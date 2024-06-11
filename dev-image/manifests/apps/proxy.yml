@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    app.openshift.io/connects-to: '["dashboard","pam-client"]'
+    app.openshift.io/connects-to: '["api","dashboard","pam-client"]'
     app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
   labels:
     app: proxy
