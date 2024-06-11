@@ -1,0 +1,105 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.openshift.io/connects-to: '["dashboard","pam-client"]'
+    app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
+  labels:
+    app: proxy
+    app.kubernetes.io/part-of: excalibur-v4-dev
+  name: proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: proxy
+      app.kubernetes.io/part-of: excalibur-v4-dev
+      deployment: proxy
+  template:
+    metadata:
+      labels:
+        app: proxy
+        app.kubernetes.io/part-of: excalibur-v4-dev
+        deployment: proxy
+    spec:
+      containers:
+        - env:
+            - name: DEV_MODE
+              value: 'true'
+            - name: EXC_SERVER_HOSTNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: environment-variables
+                  key: EXC_SERVER_HOSTNAME
+            - name: VIRTUAL_HOST
+              value: $(EXC_SERVER_HOSTNAME), www.$(EXC_SERVER_HOSTNAME)
+            - name: VIRTUAL_PORT
+              value: '8000'
+            - name: LETSENCRYPT_HOST
+              value: $(EXC_SERVER_HOSTNAME)
+          image: nginxinc/nginx-unprivileged:1.23-alpine
+          name: proxy
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+            - containerPort: 3001
+              protocol: TCP
+            - containerPort: 8000
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              cpu: 1
+              memory: 512Mi
+          volumeMounts:
+            - name: code-base
+              mountPath: /etc/nginx/certs
+              subPath: excalibur-v4/deploy/certificates
+            - name: code-base
+              mountPath: /etc/nginx/locations/default.conf
+              subPath: excalibur-v4/services/proxy/devel/locations/default.conf
+            - name: code-base
+              mountPath: /etc/nginx/templates/default.conf.template
+              subPath: excalibur-v4/services/proxy/etc/nginx/templates/default.conf.template
+            - name: code-base
+              mountPath: /etc/nginx/templates/devel.conf.template
+              subPath: excalibur-v4/services/proxy/devel/templates/devel.conf.template
+            - name: code-base
+              mountPath: /usr/share/nginx/html/dashboard
+              subPath: volumes/dashboard-static-files
+            - name: code-base
+              mountPath: /usr/share/nginx/html/pam-client
+              subPath: volumes/pam-client-static-files
+      volumes:
+        - name: code-base
+          persistentVolumeClaim:
+            claimName: code-base
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: proxy
+    app.kubernetes.io/part-of: excalibur-v4-dev
+  name: proxy
+spec:
+  ports:
+    - name: tcp-3000
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+    - name: tcp-3001
+      protocol: TCP
+      port: 3001
+      targetPort: 3001
+    - name: tcp-8000
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+  selector:
+    app: proxy
+    app.kubernetes.io/part-of: excalibur-v4-dev
+    deployment: proxy

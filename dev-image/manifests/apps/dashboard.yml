@@ -60,7 +60,7 @@ metadata:
   labels:
     app: dashboard
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: dashboard-debugger
+  name: dashboard
 spec:
   ports:
     - name: tcp-inspector

@@ -26,14 +26,14 @@ spec:
       containers:
         - command: ['sh', '-c', 'cd /opt/excalibur/api; npm run dev']
           env:
+            - name: DEV_MODE
+              value: 'true'
             - name: EXC_API_LOG_CONSOLE_ENABLED
               value: 'true'
             - name: EXC_API_LOG_CONSOLE_LEVEL
               value: 'debug'
             - name: EXC_API_LOG_LOKI_ENABLED
               value: 'false'
-            - name: DEV_MODE
-              value: 'true'
           image: registry.access.redhat.com/ubi8/nodejs-20
           name: api
           ports:
