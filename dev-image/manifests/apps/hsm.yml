@@ -1,0 +1,66 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.openshift.io/connects-to: '[]'
+    app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
+  labels:
+    app: hsm
+    app.kubernetes.io/part-of: excalibur-v4-dev
+  name: hsm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hsm
+      app.kubernetes.io/part-of: excalibur-v4-dev
+      deployment: hsm
+  template:
+    metadata:
+      labels:
+        app: hsm
+        app.kubernetes.io/part-of: excalibur-v4-dev
+        deployment: hsm
+    spec:
+      containers:
+        - image: ghcr.io/excalibur-enterprise/hsm:4.2.0
+          name: hsm
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              cpu: 1
+              memory: 512Mi
+          volumeMounts:
+            - name: code-base
+              mountPath: /app/keystore
+              subPath: excalibur-v4/deploy/keystore
+      imagePullSecrets:
+        - name: ghcr-auth
+      volumes:
+        - name: code-base
+          persistentVolumeClaim:
+            claimName: code-base
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: hsm
+    app.kubernetes.io/part-of: excalibur-v4-dev
+  name: hsm
+spec:
+  ports:
+    - name: tcp-8080
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: hsm
+    app.kubernetes.io/part-of: excalibur-v4-dev
+    deployment: hsm

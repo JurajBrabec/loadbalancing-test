@@ -46,6 +46,9 @@ spec:
                 secretKeyRef:
                   name: github-pat
                   key: token
+          envFrom:
+            - configMapRef:
+                name: environment-variables
           image: ' '
           imagePullPolicy: Always
           name: dev-image
