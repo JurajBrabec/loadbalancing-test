@@ -34,7 +34,8 @@ spec:
               value: 'debug'
             - name: EXC_API_LOG_LOKI_ENABLED
               value: 'false'
-          image: registry.access.redhat.com/ubi8/nodejs-20
+          #          image: registry.access.redhat.com/ubi8/nodejs-20
+          image: ghcr.io/excalibur-enterprise/api:latest
           name: api
           ports:
             - containerPort: 5858
@@ -48,8 +49,8 @@ spec:
               cpu: 10m
               memory: 64Mi
             limits:
-              cpu: 1
-              memory: 1Gi
+              cpu: '1'
+              memory: 2Gi
           volumeMounts:
             - name: code-base
               mountPath: /opt/excalibur/api
@@ -57,6 +58,8 @@ spec:
             - name: code-base
               mountPath: /var/excalibur/pam/recordings
               subPath: volumes/pam-recordings
+      imagePullSecrets:
+        - name: ghcr-auth
       volumes:
         - name: code-base
           persistentVolumeClaim:
@@ -71,15 +74,15 @@ metadata:
   name: api
 spec:
   ports:
-    - name: tcp-inspector
+    - name: node-inspector
       protocol: TCP
       port: 5858
       targetPort: 5858
-    - name: tcp-8000
+    - name: http
       protocol: TCP
       port: 8000
       targetPort: 8000
-    - name: tcp-8080
+    - name: grpc
       protocol: TCP
       port: 8080
       targetPort: 8080

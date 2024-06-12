@@ -1,0 +1,71 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.openshift.io/connects-to: '[]'
+    app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
+  labels:
+    app: test-ssh-key
+    app.kubernetes.io/part-of: excalibur-v4-dev
+  name: test-ssh-key
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-ssh-key
+      app.kubernetes.io/part-of: excalibur-v4-dev
+      deployment: test-ssh-key
+  template:
+    metadata:
+      labels:
+        app: test-ssh-key
+        app.kubernetes.io/part-of: excalibur-v4-dev
+        deployment: test-ssh-key
+    spec:
+      containers:
+        - env:
+            - name: PUID
+              value: '1000'
+            - name: PGID
+              value: '1000'
+            - name: TZ
+              value: 'Etc/UTC'
+            - name: SUDO_ACCESS
+              value: 'false'
+            - name: PASSWORD_ACCESS
+              value: 'false'
+            - name: PUBLIC_KEY
+              value: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILbm6r1A9nsqojhT9dF3GL7JaE3el1Mf/IRY//lHez54 root@openssh-server'
+            - name: USER_NAME
+              value: 'excalibur'
+          image: lscr.io/linuxserver/openssh-server:latest
+          name: test-ssh-key
+          ports:
+            - containerPort: 22
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              cpu: 1
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: test-ssh-key
+    app.kubernetes.io/part-of: excalibur-v4-dev
+  name: test-ssh-key
+spec:
+  ports:
+    - name: ssh
+      protocol: TCP
+      port: 22
+      targetPort: 22
+  selector:
+    app: test-ssh-key
+    app.kubernetes.io/part-of: excalibur-v4-dev
+    deployment: test-ssh-key

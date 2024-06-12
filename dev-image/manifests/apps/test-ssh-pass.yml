@@ -6,28 +6,43 @@ metadata:
     app.openshift.io/connects-to: '[]'
     app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
   labels:
-    app: loki
+    app: test-ssh-pass
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: loki
+  name: test-ssh-pass
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: loki
+      app: test-ssh-pass
       app.kubernetes.io/part-of: excalibur-v4-dev
-      deployment: loki
+      deployment: test-ssh-pass
   template:
     metadata:
       labels:
-        app: loki
+        app: test-ssh-pass
         app.kubernetes.io/part-of: excalibur-v4-dev
-        deployment: loki
+        deployment: test-ssh-pass
     spec:
       containers:
-        - image: grafana/loki:2.8.3
-          name: loki
+        - env:
+            - name: PUID
+              value: '1000'
+            - name: PGID
+              value: '1000'
+            - name: TZ
+              value: 'Etc/UTC'
+            - name: SUDO_ACCESS
+              value: 'false'
+            - name: PASSWORD_ACCESS
+              value: 'true'
+            - name: USER_PASSWORD
+              value: 'password'
+            - name: USER_NAME
+              value: 'excalibur'
+          image: lscr.io/linuxserver/openssh-server:latest
+          name: test-ssh-pass
           ports:
-            - containerPort: 3100
+            - containerPort: 22
               protocol: TCP
           resources:
             requests:
@@ -36,29 +51,21 @@ spec:
             limits:
               cpu: 1
               memory: 512Mi
-          volumeMounts:
-            - name: code-base
-              mountPath: /loki
-              subPath: volumes/loki-data
-      volumes:
-        - name: code-base
-          persistentVolumeClaim:
-            claimName: code-base
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: loki
+    app: test-ssh-pass
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: loki
+  name: test-ssh-pass
 spec:
   ports:
-    - name: loki
+    - name: ssh
       protocol: TCP
-      port: 3100
-      targetPort: 3100
+      port: 22
+      targetPort: 22
   selector:
-    app: loki
+    app: test-ssh-pass
     app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: loki
+    deployment: test-ssh-pass

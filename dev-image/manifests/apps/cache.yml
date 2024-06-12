@@ -46,7 +46,7 @@ metadata:
   name: cache
 spec:
   ports:
-    - name: tcp-6379
+    - name: redis
       protocol: TCP
       port: 6379
       targetPort: 6379

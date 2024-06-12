@@ -54,10 +54,10 @@ metadata:
   labels:
     app: guacd
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: guacd
+  name: guacd-tenant-0-service
 spec:
   ports:
-    - name: tcp-4822
+    - name: guacd
       protocol: TCP
       port: 4822
       targetPort: 4822

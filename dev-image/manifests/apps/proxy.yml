@@ -95,7 +95,7 @@ spec:
       protocol: TCP
       port: 3001
       targetPort: 3001
-    - name: tcp-8000
+    - name: http
       protocol: TCP
       port: 8000
       targetPort: 8000
@@ -103,3 +103,56 @@ spec:
     app: proxy
     app.kubernetes.io/part-of: excalibur-v4-dev
     deployment: proxy
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  labels:
+    app: proxy
+    app.kubernetes.io/part-of: excalibur-v4-dev
+  name: proxy
+spec:
+  host: proxy-dev-test.apps.xclbr-dev.lab.soitron.as
+  to:
+    kind: Service
+    name: proxy
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+  httpHeaders:
+    actions:
+      request:
+        - name: Connection
+          action:
+            type: Set
+            set:
+              value: Upgrade
+        - name: Upgrade
+          action:
+            type: Set
+            set:
+              value: websocket
+        - name: X-Forwarded-Proto
+          action:
+            type: Set
+            set:
+              value: https
+        - name: X-Forwarded-SSL
+          action:
+            type: Set
+            set:
+              value: 'on'
+        - name: X-Forwarded-Port
+          action:
+            type: Set
+            set:
+              value: '443'
+        - name: X-Forwarded-Host
+          action:
+            type: Set
+            set:
+              value: proxy-dev-test.apps.xclbr-dev.lab.soitron.as

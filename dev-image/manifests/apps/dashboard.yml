@@ -63,7 +63,7 @@ metadata:
   name: dashboard
 spec:
   ports:
-    - name: tcp-inspector
+    - name: node-inspector
       protocol: TCP
       port: 5858
       targetPort: 5858

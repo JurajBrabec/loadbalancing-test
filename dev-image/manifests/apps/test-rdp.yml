@@ -3,31 +3,34 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    app.openshift.io/connects-to: '["hsm"]'
+    app.openshift.io/connects-to: '[]'
     app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
   labels:
-    app: ca
+    app: test-rdp
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: ca
+  name: test-rdp
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ca
+      app: test-rdp
       app.kubernetes.io/part-of: excalibur-v4-dev
-      deployment: ca
+      deployment: test-rdp
   template:
     metadata:
       labels:
-        app: ca
+        app: test-rdp
         app.kubernetes.io/part-of: excalibur-v4-dev
-        deployment: ca
+        deployment: test-rdp
     spec:
       containers:
-        - image: ghcr.io/excalibur-enterprise/ca:4.2.0
-          name: ca
+        - env:
+            - name: GUEST_PASS
+              value: 'excalibur'
+          image: satishweb/xrdp:latest
+          name: test-rdp
           ports:
-            - containerPort: 8080
+            - containerPort: 3389
               protocol: TCP
           resources:
             requests:
@@ -36,23 +39,21 @@ spec:
             limits:
               cpu: 1
               memory: 512Mi
-      imagePullSecrets:
-        - name: ghcr-auth
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: ca
+    app: test-rdp
     app.kubernetes.io/part-of: excalibur-v4-dev
-  name: ca
+  name: test-rdp
 spec:
   ports:
-    - name: grpc
+    - name: rdp
       protocol: TCP
-      port: 8080
-      targetPort: 8080
+      port: 3389
+      targetPort: 3389
   selector:
-    app: ca
+    app: test-rdp
     app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: ca
+    deployment: test-rdp

@@ -67,11 +67,11 @@ metadata:
   name: pam-orchestrator
 spec:
   ports:
-    - name: tcp-inspector
+    - name: node-inspector
       protocol: TCP
       port: 5858
       targetPort: 5858
-    - name: tcp-8000
+    - name: http
       protocol: TCP
       port: 8000
       targetPort: 8000
