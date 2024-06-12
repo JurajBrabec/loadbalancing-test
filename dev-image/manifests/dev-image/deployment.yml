@@ -54,11 +54,11 @@ spec:
           name: dev-image
           resources:
             requests:
-              cpu: 100m
-              memory: 512Mi
+              cpu: 1m
+              memory: 1Gi
             limits:
-              cpu: 1
-              memory: 2Gi
+              cpu: 500m
+              memory: 3Gi
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

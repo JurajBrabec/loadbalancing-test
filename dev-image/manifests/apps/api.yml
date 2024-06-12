@@ -46,11 +46,11 @@ spec:
               protocol: TCP
           resources:
             requests:
-              cpu: 10m
-              memory: 64Mi
+              cpu: 1m
+              memory: 1Gi
             limits:
-              cpu: '1'
-              memory: 2Gi
+              cpu: 500m
+              memory: 3Gi
           volumeMounts:
             - name: code-base
               mountPath: /opt/excalibur/api
