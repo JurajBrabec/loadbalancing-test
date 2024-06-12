@@ -23,22 +23,6 @@ spec:
         app.kubernetes.io/part-of: excalibur-v4-dev
         deployment: dev-image
     spec:
-      # initContainers:
-      #   - name: init-permissions
-      #     image: busybox
-      #     command:
-      #       [
-      #         'sh',
-      #         '-c',
-      #         'chmod -R 775 /mnt/code-base,
-      #       ]
-      #     resources:
-      #       limits:
-      #         cpu: 100m
-      #         memory: 128Mi
-      # volumeMounts:
-      #   - mountPath: /mnt/code-base
-      #     name: code-base
       containers:
         - env:
             - name: GITHUB_PAT
