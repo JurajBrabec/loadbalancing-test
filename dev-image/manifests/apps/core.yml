@@ -38,13 +38,19 @@ spec:
               value: https://ca.xclbr.dev
             - name: NODE_EXTRA_CA_CERTS
               value: /usr/local/share/ca-certificates/ca.xclbr.dev.crt
-          image: registry.access.redhat.com/ubi8/nodejs-20
+          # image: registry.access.redhat.com/ubi8/nodejs-20
+          image: ghcr.io/excalibur-enterprise/core:4.0.0-alpha.2
           name: core
           ports:
             - containerPort: 5858
               protocol: TCP
             - containerPort: 8080
               protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 1
+            initialDelaySeconds: 30
           resources:
             requests:
               cpu: 1m
@@ -59,6 +65,8 @@ spec:
             - name: code-base
               mountPath: /usr/local/share/ca-certificates/ca.xclbr.dev.crt
               subPath: excalibur-v4/deploy/certificates/ca.xclbr.dev.crt
+      imagePullSecrets:
+        - name: ghcr-auth
       volumes:
         - name: code-base
           persistentVolumeClaim:

@@ -34,13 +34,19 @@ spec:
               value: debug
             - name: EXC_MAIL_LOG_LOKI_ENABLED
               value: 'false'
-          image: registry.access.redhat.com/ubi8/nodejs-20
+          # image: registry.access.redhat.com/ubi8/nodejs-20
+          image: ghcr.io/excalibur-enterprise/mailer:4.0.0-alpha.1
           name: mailer
           ports:
             - containerPort: 5858
               protocol: TCP
             - containerPort: 8080
               protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 1
+            initialDelaySeconds: 30
           resources:
             requests:
               cpu: 1m
@@ -52,6 +58,8 @@ spec:
             - name: code-base
               mountPath: /opt/excalibur/mailer
               subPath: excalibur-v4/services/mailer
+      imagePullSecrets:
+        - name: ghcr-auth
       volumes:
         - name: code-base
           persistentVolumeClaim:

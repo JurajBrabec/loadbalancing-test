@@ -44,6 +44,11 @@ spec:
           ports:
             - containerPort: 22
               protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 22
+            timeoutSeconds: 1
+            initialDelaySeconds: 30
           resources:
             requests:
               cpu: 1m

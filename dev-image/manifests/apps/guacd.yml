@@ -2,66 +2,71 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    app.openshift.io/connects-to: '[]'
-    app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
-  labels:
-    app: guacd
-    app.kubernetes.io/part-of: excalibur-v4-dev
-  name: guacd
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: guacd
-      app.kubernetes.io/part-of: excalibur-v4-dev
-      deployment: guacd
-  template:
-    metadata:
-      labels:
+    annotations:
+        app.openshift.io/connects-to: "[]"
+        app.openshift.io/vcs-uri: "https://github.com/excalibur-enterprise/excalibur-v4-api"
+    labels:
         app: guacd
         app.kubernetes.io/part-of: excalibur-v4-dev
-        deployment: guacd
-    spec:
-      containers:
-        - env:
-            - name: GUACD_LOG_LEVEL
-              value: debug
-          image: guacamole/guacd:1.5.2
-          name: guacd
-          ports:
-            - containerPort: 4822
-              protocol: TCP
-          resources:
-            requests:
-              cpu: 1m
-              memory: 64Mi
-            limits:
-              cpu: 500m
-              memory: 512Mi
-          volumeMounts:
-            - name: code-base
-              mountPath: /var/excalibur/pam-recordings
-              subPath: volumes/pam-recordings
-      volumes:
-        - name: code-base
-          persistentVolumeClaim:
-            claimName: code-base
+    name: guacd
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: guacd
+            app.kubernetes.io/part-of: excalibur-v4-dev
+            deployment: guacd
+    template:
+        metadata:
+            labels:
+                app: guacd
+                app.kubernetes.io/part-of: excalibur-v4-dev
+                deployment: guacd
+        spec:
+            containers:
+                - env:
+                      - name: GUACD_LOG_LEVEL
+                        value: debug
+                  image: guacamole/guacd:1.5.2
+                  name: guacd
+                  ports:
+                      - containerPort: 4822
+                        protocol: TCP
+                  readinessProbe:
+                      tcpSocket:
+                          port: 4822
+                      timeoutSeconds: 1
+                      initialDelaySeconds: 30
+                  resources:
+                      requests:
+                          cpu: 1m
+                          memory: 64Mi
+                      limits:
+                          cpu: 500m
+                          memory: 512Mi
+                  volumeMounts:
+                      - name: code-base
+                        mountPath: /var/excalibur/pam-recordings
+                        subPath: volumes/pam-recordings
+            volumes:
+                - name: code-base
+                  persistentVolumeClaim:
+                      claimName: code-base
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    app: guacd
-    app.kubernetes.io/part-of: excalibur-v4-dev
-  name: guacd-tenant-0-service
+    labels:
+        app: guacd
+        app.kubernetes.io/part-of: excalibur-v4-dev
+    name: guacd-tenant-0-service
 spec:
-  ports:
-    - name: guacd
-      protocol: TCP
-      port: 4822
-      targetPort: 4822
-  selector:
-    app: guacd
-    app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: guacd
+    ports:
+        - name: guacd
+          protocol: TCP
+          port: 4822
+          targetPort: 4822
+    selector:
+        app: guacd
+        app.kubernetes.io/part-of: excalibur-v4-dev
+        deployment: guacd

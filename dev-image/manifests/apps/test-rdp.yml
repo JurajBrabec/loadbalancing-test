@@ -32,6 +32,11 @@ spec:
           ports:
             - containerPort: 3389
               protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 3389
+            timeoutSeconds: 1
+            initialDelaySeconds: 30
           resources:
             requests:
               cpu: 1m

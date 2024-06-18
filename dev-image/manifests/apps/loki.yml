@@ -2,63 +2,68 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    app.openshift.io/connects-to: '[]'
-    app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
-  labels:
-    app: loki
-    app.kubernetes.io/part-of: excalibur-v4-dev
-  name: loki
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: loki
-      app.kubernetes.io/part-of: excalibur-v4-dev
-      deployment: loki
-  template:
-    metadata:
-      labels:
+    annotations:
+        app.openshift.io/connects-to: "[]"
+        app.openshift.io/vcs-uri: "https://github.com/excalibur-enterprise/excalibur-v4-api"
+    labels:
         app: loki
         app.kubernetes.io/part-of: excalibur-v4-dev
-        deployment: loki
-    spec:
-      containers:
-        - image: grafana/loki:2.8.3
-          name: loki
-          ports:
-            - containerPort: 3100
-              protocol: TCP
-          resources:
-            requests:
-              cpu: 1m
-              memory: 64Mi
-            limits:
-              cpu: 500m
-              memory: 512Mi
-          volumeMounts:
-            - name: code-base
-              mountPath: /loki
-              subPath: volumes/loki-data
-      volumes:
-        - name: code-base
-          persistentVolumeClaim:
-            claimName: code-base
+    name: loki
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: loki
+            app.kubernetes.io/part-of: excalibur-v4-dev
+            deployment: loki
+    template:
+        metadata:
+            labels:
+                app: loki
+                app.kubernetes.io/part-of: excalibur-v4-dev
+                deployment: loki
+        spec:
+            containers:
+                - image: grafana/loki:2.8.3
+                  name: loki
+                  ports:
+                      - containerPort: 3100
+                        protocol: TCP
+                  readinessProbe:
+                      tcpSocket:
+                          port: 3100
+                      timeoutSeconds: 1
+                      initialDelaySeconds: 30
+                  resources:
+                      requests:
+                          cpu: 1m
+                          memory: 64Mi
+                      limits:
+                          cpu: 500m
+                          memory: 512Mi
+                  volumeMounts:
+                      - name: code-base
+                        mountPath: /loki
+                        subPath: volumes/loki-data
+            volumes:
+                - name: code-base
+                  persistentVolumeClaim:
+                      claimName: code-base
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    app: loki
-    app.kubernetes.io/part-of: excalibur-v4-dev
-  name: loki
+    labels:
+        app: loki
+        app.kubernetes.io/part-of: excalibur-v4-dev
+    name: loki
 spec:
-  ports:
-    - name: loki
-      protocol: TCP
-      port: 3100
-      targetPort: 3100
-  selector:
-    app: loki
-    app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: loki
+    ports:
+        - name: loki
+          protocol: TCP
+          port: 3100
+          targetPort: 3100
+    selector:
+        app: loki
+        app.kubernetes.io/part-of: excalibur-v4-dev
+        deployment: loki

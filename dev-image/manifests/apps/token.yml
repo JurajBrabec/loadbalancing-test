@@ -34,7 +34,8 @@ spec:
               value: debug
             - name: EXC_TOKEN_LOG_LOKI_ENABLED
               value: 'false'
-          image: registry.access.redhat.com/ubi8/nodejs-20
+          # image: registry.access.redhat.com/ubi8/nodejs-20
+          image: ghcr.io/excalibur-enterprise/token:4.0.0-alpha.1
           name: token
           ports:
             - containerPort: 5858
@@ -43,6 +44,11 @@ spec:
               protocol: TCP
             - containerPort: 8080
               protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            timeoutSeconds: 1
+            initialDelaySeconds: 30
           resources:
             requests:
               cpu: 1m
@@ -54,6 +60,8 @@ spec:
             - name: code-base
               mountPath: /opt/excalibur/token
               subPath: excalibur-v4/services/token
+      imagePullSecrets:
+        - name: ghcr-auth
       volumes:
         - name: code-base
           persistentVolumeClaim:

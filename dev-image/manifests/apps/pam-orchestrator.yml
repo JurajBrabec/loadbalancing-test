@@ -35,13 +35,19 @@ spec:
               value: debug
             - name: EXC_PAM_ORCHESTRATOR_LOG_LOKI_ENABLED
               value: 'false'
-          image: registry.access.redhat.com/ubi8/nodejs-20
+          # image: registry.access.redhat.com/ubi8/nodejs-20
+          image: ghcr.io/excalibur-enterprise/pam-orchestrator:4.0.0-alpha.0
           name: pam-orchestrator
           ports:
             - containerPort: 5858
               protocol: TCP
             - containerPort: 8000
               protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            timeoutSeconds: 1
+            initialDelaySeconds: 30
           resources:
             requests:
               cpu: 1m
@@ -53,6 +59,8 @@ spec:
             - name: code-base
               mountPath: /opt/excalibur/pam-orchestrator
               subPath: excalibur-v4/services/pam-orchestrator
+      imagePullSecrets:
+        - name: ghcr-auth
       volumes:
         - name: code-base
           persistentVolumeClaim:

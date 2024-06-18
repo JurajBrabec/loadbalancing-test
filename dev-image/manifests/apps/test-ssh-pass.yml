@@ -41,6 +41,11 @@ spec:
               value: 'excalibur'
           image: lscr.io/linuxserver/openssh-server:latest
           name: test-ssh-pass
+          readinessProbe:
+            tcpSocket:
+              port: 22
+            timeoutSeconds: 1
+            initialDelaySeconds: 30
           ports:
             - containerPort: 22
               protocol: TCP

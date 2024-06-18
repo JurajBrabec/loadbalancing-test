@@ -32,7 +32,8 @@ spec:
               value: 'true'
             - name: EXC_PAM_LOG_CONSOLE_LEVEL
               value: debug
-          image: registry.access.redhat.com/ubi8/nodejs-20
+          # image: registry.access.redhat.com/ubi8/nodejs-20
+          image: ghcr.io/excalibur-enterprise/pam:4.0.0-alpha.2
           name: pam
           ports:
             - containerPort: 5858
@@ -41,6 +42,11 @@ spec:
               protocol: TCP
             - containerPort: 8080
               protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 1
+            initialDelaySeconds: 30
           resources:
             requests:
               cpu: 1m
@@ -55,6 +61,8 @@ spec:
             - name: code-base
               mountPath: /var/excalibur/pam/recordings
               subPath: volumes/pam-recordings
+      imagePullSecrets:
+        - name: ghcr-auth
       volumes:
         - name: code-base
           persistentVolumeClaim:

@@ -28,17 +28,23 @@ spec:
           env:
             - name: DEV_MODE
               value: 'true'
-          image: registry.access.redhat.com/ubi8/nodejs-20
+          # image: registry.access.redhat.com/ubi8/nodejs-20
+          image: ghcr.io/excalibur-enterprise/dashboard:4.0.0-alpha.2
           name: dashboard
           ports:
             - containerPort: 5858
               protocol: TCP
             - containerPort: 3000
               protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 3000
+            timeoutSeconds: 1
+            initialDelaySeconds: 30
           resources:
             requests:
               cpu: 1m
-              memory: 1Gi
+              memory: 2Gi
             limits:
               cpu: 500m
               memory: 3Gi
@@ -49,6 +55,8 @@ spec:
             - name: code-base
               mountPath: /usr/share/nginx/html
               subPath: volumes/dashboard-static-files
+      imagePullSecrets:
+        - name: ghcr-auth
       volumes:
         - name: code-base
           persistentVolumeClaim:

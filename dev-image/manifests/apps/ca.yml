@@ -2,57 +2,62 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    app.openshift.io/connects-to: '["hsm"]'
-    app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
-  labels:
-    app: ca
-    app.kubernetes.io/part-of: excalibur-v4-dev
-  name: ca
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: ca
-      app.kubernetes.io/part-of: excalibur-v4-dev
-      deployment: ca
-  template:
-    metadata:
-      labels:
+    annotations:
+        app.openshift.io/connects-to: '["hsm"]'
+        app.openshift.io/vcs-uri: "https://github.com/excalibur-enterprise/excalibur-v4-api"
+    labels:
         app: ca
         app.kubernetes.io/part-of: excalibur-v4-dev
-        deployment: ca
-    spec:
-      containers:
-        - image: ghcr.io/excalibur-enterprise/ca:4.2.0
-          name: ca
-          ports:
-            - containerPort: 8080
-              protocol: TCP
-          resources:
-            requests:
-              cpu: 1m
-              memory: 8Mi
-            limits:
-              cpu: 500m
-              memory: 512Mi
-      imagePullSecrets:
-        - name: ghcr-auth
+    name: ca
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: ca
+            app.kubernetes.io/part-of: excalibur-v4-dev
+            deployment: ca
+    template:
+        metadata:
+            labels:
+                app: ca
+                app.kubernetes.io/part-of: excalibur-v4-dev
+                deployment: ca
+        spec:
+            containers:
+                - image: ghcr.io/excalibur-enterprise/ca:4.2.0
+                  name: ca
+                  ports:
+                      - containerPort: 8080
+                        protocol: TCP
+                  readinessProbe:
+                      tcpSocket:
+                          port: 8080
+                      timeoutSeconds: 1
+                      initialDelaySeconds: 30
+                  resources:
+                      requests:
+                          cpu: 1m
+                          memory: 8Mi
+                      limits:
+                          cpu: 500m
+                          memory: 512Mi
+            imagePullSecrets:
+                - name: ghcr-auth
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    app: ca
-    app.kubernetes.io/part-of: excalibur-v4-dev
-  name: ca
+    labels:
+        app: ca
+        app.kubernetes.io/part-of: excalibur-v4-dev
+    name: ca
 spec:
-  ports:
-    - name: grpc
-      protocol: TCP
-      port: 8080
-      targetPort: 8080
-  selector:
-    app: ca
-    app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: ca
+    ports:
+        - name: grpc
+          protocol: TCP
+          port: 8080
+          targetPort: 8080
+    selector:
+        app: ca
+        app.kubernetes.io/part-of: excalibur-v4-dev
+        deployment: ca

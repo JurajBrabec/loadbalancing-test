@@ -2,157 +2,162 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    app.openshift.io/connects-to: '["api","dashboard","pam-client"]'
-    app.openshift.io/vcs-uri: 'https://github.com/excalibur-enterprise/excalibur-v4-api'
-  labels:
-    app: proxy
-    app.kubernetes.io/part-of: excalibur-v4-dev
-  name: proxy
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: proxy
-      app.kubernetes.io/part-of: excalibur-v4-dev
-      deployment: proxy
-  template:
-    metadata:
-      labels:
+    annotations:
+        app.openshift.io/connects-to: '["api","dashboard","pam-client"]'
+        app.openshift.io/vcs-uri: "https://github.com/excalibur-enterprise/excalibur-v4-api"
+    labels:
         app: proxy
         app.kubernetes.io/part-of: excalibur-v4-dev
-        deployment: proxy
-    spec:
-      containers:
-        - env:
-            - name: DEV_MODE
-              value: 'true'
-            - name: EXC_SERVER_HOSTNAME
-              valueFrom:
-                configMapKeyRef:
-                  name: environment-variables
-                  key: EXC_SERVER_HOSTNAME
-            - name: VIRTUAL_HOST
-              value: $(EXC_SERVER_HOSTNAME), www.$(EXC_SERVER_HOSTNAME)
-            - name: VIRTUAL_PORT
-              value: '8000'
-            - name: LETSENCRYPT_HOST
-              value: $(EXC_SERVER_HOSTNAME)
-          image: nginxinc/nginx-unprivileged:1.23-alpine
-          name: proxy
-          ports:
-            - containerPort: 3000
-              protocol: TCP
-            - containerPort: 3001
-              protocol: TCP
-            - containerPort: 8000
-              protocol: TCP
-          resources:
-            requests:
-              cpu: 1m
-              memory: 8Mi
-            limits:
-              cpu: 500m
-              memory: 512Mi
-          volumeMounts:
-            - name: code-base
-              mountPath: /etc/nginx/certs
-              subPath: excalibur-v4/deploy/certificates
-            - name: code-base
-              mountPath: /etc/nginx/locations/default.conf
-              subPath: excalibur-v4/services/proxy/devel/locations/default.conf
-            - name: code-base
-              mountPath: /etc/nginx/templates/default.conf.template
-              subPath: excalibur-v4/services/proxy/etc/nginx/templates/default.conf.template
-            - name: code-base
-              mountPath: /etc/nginx/templates/devel.conf.template
-              subPath: excalibur-v4/services/proxy/devel/templates/devel.conf.template
-            - name: code-base
-              mountPath: /usr/share/nginx/html/dashboard
-              subPath: volumes/dashboard-static-files
-            - name: code-base
-              mountPath: /usr/share/nginx/html/pam-client
-              subPath: volumes/pam-client-static-files
-      volumes:
-        - name: code-base
-          persistentVolumeClaim:
-            claimName: code-base
+    name: proxy
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: proxy
+            app.kubernetes.io/part-of: excalibur-v4-dev
+            deployment: proxy
+    template:
+        metadata:
+            labels:
+                app: proxy
+                app.kubernetes.io/part-of: excalibur-v4-dev
+                deployment: proxy
+        spec:
+            containers:
+                - env:
+                      - name: DEV_MODE
+                        value: "true"
+                      - name: EXC_SERVER_HOSTNAME
+                        valueFrom:
+                            configMapKeyRef:
+                                name: environment-variables
+                                key: EXC_SERVER_HOSTNAME
+                      - name: VIRTUAL_HOST
+                        value: $(EXC_SERVER_HOSTNAME), www.$(EXC_SERVER_HOSTNAME)
+                      - name: VIRTUAL_PORT
+                        value: "8000"
+                      - name: LETSENCRYPT_HOST
+                        value: $(EXC_SERVER_HOSTNAME)
+                  image: nginxinc/nginx-unprivileged:1.23-alpine
+                  name: proxy
+                  ports:
+                      - containerPort: 3000
+                        protocol: TCP
+                      - containerPort: 3001
+                        protocol: TCP
+                      - containerPort: 8000
+                        protocol: TCP
+                  readinessProbe:
+                      tcpSocket:
+                          port: 8000
+                      timeoutSeconds: 1
+                      initialDelaySeconds: 30
+                  resources:
+                      requests:
+                          cpu: 1m
+                          memory: 8Mi
+                      limits:
+                          cpu: 500m
+                          memory: 512Mi
+                  volumeMounts:
+                      - name: code-base
+                        mountPath: /etc/nginx/certs
+                        subPath: excalibur-v4/deploy/certificates
+                      - name: code-base
+                        mountPath: /etc/nginx/locations/default.conf
+                        subPath: excalibur-v4/services/proxy/devel/locations/default.conf
+                      - name: code-base
+                        mountPath: /etc/nginx/templates/default.conf.template
+                        subPath: excalibur-v4/services/proxy/etc/nginx/templates/default.conf.template
+                      - name: code-base
+                        mountPath: /etc/nginx/templates/devel.conf.template
+                        subPath: excalibur-v4/services/proxy/devel/templates/devel.conf.template
+                      - name: code-base
+                        mountPath: /usr/share/nginx/html/dashboard
+                        subPath: volumes/dashboard-static-files
+                      - name: code-base
+                        mountPath: /usr/share/nginx/html/pam-client
+                        subPath: volumes/pam-client-static-files
+            volumes:
+                - name: code-base
+                  persistentVolumeClaim:
+                      claimName: code-base
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    app: proxy
-    app.kubernetes.io/part-of: excalibur-v4-dev
-  name: proxy
+    labels:
+        app: proxy
+        app.kubernetes.io/part-of: excalibur-v4-dev
+    name: proxy
 spec:
-  ports:
-    - name: tcp-3000
-      protocol: TCP
-      port: 3000
-      targetPort: 3000
-    - name: tcp-3001
-      protocol: TCP
-      port: 3001
-      targetPort: 3001
-    - name: http
-      protocol: TCP
-      port: 8000
-      targetPort: 8000
-  selector:
-    app: proxy
-    app.kubernetes.io/part-of: excalibur-v4-dev
-    deployment: proxy
+    ports:
+        - name: tcp-3000
+          protocol: TCP
+          port: 3000
+          targetPort: 3000
+        - name: tcp-3001
+          protocol: TCP
+          port: 3001
+          targetPort: 3001
+        - name: http
+          protocol: TCP
+          port: 8000
+          targetPort: 8000
+    selector:
+        app: proxy
+        app.kubernetes.io/part-of: excalibur-v4-dev
+        deployment: proxy
 ---
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
-  labels:
-    app: proxy
-    app.kubernetes.io/part-of: excalibur-v4-dev
-  name: proxy
-spec:
-  host: proxy-dev-test.apps.xclbr-dev.lab.soitron.as
-  to:
-    kind: Service
+    labels:
+        app: proxy
+        app.kubernetes.io/part-of: excalibur-v4-dev
     name: proxy
-    weight: 100
-  port:
-    targetPort: http
-  tls:
-    termination: edge
-    insecureEdgeTerminationPolicy: Redirect
-  wildcardPolicy: None
-  httpHeaders:
-    actions:
-      request:
-        - name: Connection
-          action:
-            type: Set
-            set:
-              value: Upgrade
-        - name: Upgrade
-          action:
-            type: Set
-            set:
-              value: websocket
-        - name: X-Forwarded-Proto
-          action:
-            type: Set
-            set:
-              value: https
-        - name: X-Forwarded-SSL
-          action:
-            type: Set
-            set:
-              value: 'on'
-        - name: X-Forwarded-Port
-          action:
-            type: Set
-            set:
-              value: '443'
-        - name: X-Forwarded-Host
-          action:
-            type: Set
-            set:
-              value: proxy-dev-test.apps.xclbr-dev.lab.soitron.as
+spec:
+    host: proxy-dev.apps.xclbr-dev.lab.soitron.as
+    to:
+        kind: Service
+        name: proxy
+        weight: 100
+    port:
+        targetPort: http
+    tls:
+        termination: edge
+        insecureEdgeTerminationPolicy: Redirect
+    wildcardPolicy: None
+    httpHeaders:
+        actions:
+            request:
+                - name: Connection
+                  action:
+                      type: Set
+                      set:
+                          value: Upgrade
+                - name: Upgrade
+                  action:
+                      type: Set
+                      set:
+                          value: websocket
+                - name: X-Forwarded-Proto
+                  action:
+                      type: Set
+                      set:
+                          value: https
+                - name: X-Forwarded-SSL
+                  action:
+                      type: Set
+                      set:
+                          value: "on"
+                - name: X-Forwarded-Port
+                  action:
+                      type: Set
+                      set:
+                          value: "443"
+                - name: X-Forwarded-Host
+                  action:
+                      type: Set
+                      set:
+                          value: proxy-dev-test.apps.xclbr-dev.lab.soitron.as

@@ -34,24 +34,32 @@ spec:
               value: debug
             - name: EXC_IDENTITY_STORE_LOG_LOKI_ENABLED
               value: 'false'
-          image: registry.access.redhat.com/ubi8/nodejs-20
+          # image: registry.access.redhat.com/ubi8/nodejs-20
+          image: ghcr.io/excalibur-enterprise/identity-store:4.0.0-alpha.2
           name: identity-store
           ports:
             - containerPort: 5858
               protocol: TCP
             - containerPort: 8080
               protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 1
+            initialDelaySeconds: 30
           resources:
             requests:
               cpu: 1m
-              memory: 256Mi
+              memory: 512Mi
             limits:
               cpu: 500m
-              memory: 512Mi
+              memory: 1Gi
           volumeMounts:
             - name: code-base
               mountPath: /opt/excalibur/identity-store
               subPath: excalibur-v4/services/identity-store
+      imagePullSecrets:
+        - name: ghcr-auth
       volumes:
         - name: code-base
           persistentVolumeClaim:
