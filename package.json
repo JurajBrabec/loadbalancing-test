@@ -4,8 +4,10 @@
   "description": "",
   "main": "app-1.js",
   "scripts": {
-    "dev:app-1": "nodemon --inspect -L app-1.js",
-    "dev:app-2": "nodemon --inspect -L app-2.js"
+    "dev:app-1-debug": "nodemon --delay 1 --inspect -L app-1.js",
+    "dev:app-1": "nodemon --delay 1 -L app-1.js",
+    "dev:app-2-debug": "nodemon --inspect -L app-2.js",
+    "dev:app-2": "nodemon -L app-2.js"
   },
   "keywords": [],
   "author": "",
