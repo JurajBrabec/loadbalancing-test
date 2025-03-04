@@ -1,0 +1,55 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-autoscaler
+  namespace: knative-serving
+data:
+  # Allow scaling to zero.
+  allow-zero-initial-scale: 'true'
+  # Scale to zero after 1 second of inactivity.
+  scale-to-zero-grace-period: '1s'
+---
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  annotations:
+    serving.knative.dev/visibility: cluster-local
+  name: app-2-knative
+spec:
+  template:
+    metadata:
+      annotations:
+        # Set initial scale to zero.
+        autoscaling.knative.dev/initial-scale: '0'
+        # Allows scaling to zero when idle.
+        autoscaling.knative.dev/minScale: '0'
+        # Set maximum scale to 5.
+        autoscaling.knative.dev/maxScale: '5'
+        # Set scaling target to 5 requests per second.
+        autoscaling.knative.dev/metric: 'rps'
+        autoscaling.knative.dev/target: '5'
+        # Set scaling window to 10 seconds.
+        autoscaling.knative.dev/window: '10s'
+      labels:
+        app: app-2-knative
+    spec:
+      # Set container concurrency to 5
+      containerConcurrency: 5
+      containers:
+        - image: 'ghcr.io/jurajbrabec/loadbalancing-test/app-2'
+          name: app-2-knative
+          ports:
+            # name 'h2c' allows HTTP/2 over TCP required for gRPC
+            - name: h2c
+              containerPort: 8080
+              protocol: TCP
+          # Get rid of the warning
+          # securityContext:
+          #   allowPrivilegeEscalation: false
+          #   capabilities:
+          #     drop: ['ALL']
+          #   runAsNonRoot: true
+          #   seccompProfile:
+          #     type: RuntimeDefault
+#      terminationGracePeriodSeconds: 5
